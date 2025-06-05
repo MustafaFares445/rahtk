@@ -13,6 +13,7 @@ use App\Models\School;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
 use Symfony\Component\HttpFoundation\Exception\BadRequestException;
+use Illuminate\Support\Str;
 
 class SearchController extends Controller
 {
@@ -59,7 +60,6 @@ class SearchController extends Controller
                     'area',
                     'floors_number',
                     'is_furnished',
-                    'address',
                     'floor',
                 ];
                 $modelQuery = Estate::query();
@@ -77,7 +77,6 @@ class SearchController extends Controller
                     'quate',
                     'working_duration',
                     'founding_date',
-                    'address',
                     'manager',
                     'manager_description',
                 ];
@@ -190,7 +189,8 @@ class SearchController extends Controller
 
             $productsQuery->whereHas($request->get('type') , function($q) use ($request){
                 foreach($request->get('filters') as $filter){
-                    $q->where($filter[0] , $filter[1]);
+                    $snakeCaseKey = Str::snake($filter[0]);
+                    $q->where($snakeCaseKey , $filter[1]);
                 }
             });
 
