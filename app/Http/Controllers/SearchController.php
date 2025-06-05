@@ -127,7 +127,7 @@ class SearchController extends Controller
      *         required=true,
      *         @OA\Schema(
      *             type="string",
-     *             enum={"ESTATE", "CAR", "SCHOOL", "ELECTRONIC", "BUILDING"}
+     *             enum={"estate", "car", "school", "electronic", "building"}
      *         )
      *     ),
      *     @OA\Parameter(

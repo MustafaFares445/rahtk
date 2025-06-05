@@ -216,11 +216,11 @@
                         "schema": {
                             "type": "string",
                             "enum": [
-                                "ESTATE",
-                                "CAR",
-                                "SCHOOL",
-                                "ELECTRONIC",
-                                "BUILDING"
+                                "estate",
+                                "car",
+                                "school",
+                                "electronic",
+                                "building"
                             ]
                         }
                     },
