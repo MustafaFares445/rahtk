@@ -59,11 +59,11 @@ class TeacherSeeder extends Seeder
         ];
 
         foreach ($teachers as $teacherData) {
-            $teacher = Teacher::create($teacherData);
+            $teacher = Teacher::query()->create($teacherData);
 
             // Add a fake online image to the 'profile_images' collection
             $teacher->addMediaFromUrl('https://picsum.photos/200/300') // Example URL for a random image
-                    ->toMediaCollection('profile_images');
+                    ->toMediaCollection('images');
         }
     }
 }
