@@ -9,7 +9,7 @@ class SchoolClassSeeder extends Seeder
 {
     public function run()
     {
-        SchoolClass::query()->insert([
+        $classes = [
             [
                 'name' => 'الصف الأول الابتدائي',
                 'type' => 'initial',
@@ -52,6 +52,14 @@ class SchoolClassSeeder extends Seeder
                 'created_at' => now(),
                 'updated_at' => now(),
             ],
-        ]);
+        ];
+
+        foreach ($classes as $class) {
+            $schoolClass = SchoolClass::create($class);
+
+            // Add a fake online image
+            $schoolClass->addMediaFromUrl('https://picsum.photos/200/300')
+                        ->toMediaCollection('images');
+        }
     }
 }

@@ -9,7 +9,7 @@ class SchoolSeeder extends Seeder
 {
     public function run()
     {
-        School::query()->insert([
+        $schools = [
             [
                 'product_id' => 3,
                 'quate' => 'العلم نور',
@@ -32,6 +32,17 @@ class SchoolSeeder extends Seeder
                 'created_at' => now(),
                 'updated_at' => now(),
             ],
-        ]);
+        ];
+
+        foreach ($schools as $school) {
+            $schoolRecord = School::create($school);
+
+            // Add a fake online image
+            $schoolRecord->addMediaFromUrl('https://picsum.photos/200/300')
+                         ->toMediaCollection('images');
+
+            $schoolRecord->addMediaFromUrl('https://picsum.photos/200/300')
+                         ->toMediaCollection('managers-images');
+        }
     }
 }

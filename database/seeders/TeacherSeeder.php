@@ -13,7 +13,7 @@ class TeacherSeeder extends Seeder
      */
     public function run()
     {
-        Teacher::query()->insert([
+        $teachers = [
             [
                 'name' => 'أ. محمد أحمد',
                 'school_id' => 1,
@@ -56,6 +56,14 @@ class TeacherSeeder extends Seeder
                 'created_at' => now(),
                 'updated_at' => now(),
             ],
-        ]);
+        ];
+
+        foreach ($teachers as $teacherData) {
+            $teacher = Teacher::create($teacherData);
+
+            // Add a fake online image to the 'profile_images' collection
+            $teacher->addMediaFromUrl('https://picsum.photos/200/300') // Example URL for a random image
+                    ->toMediaCollection('profile_images');
+        }
     }
 }

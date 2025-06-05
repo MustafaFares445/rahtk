@@ -9,35 +9,43 @@ class AdSeeder extends Seeder
 {
     public function run()
     {
-        Ad::query()->insert([
+        $ads = [
             [
                 'title' => 'عروض الصيف على العقارات',
-                'start_date' => '2025-06-01 00:00:00',
-                'end_date' => '2025-08-31 23:59:59',
+                'start_date' => now(),
+                'end_date' => now()->addMonth(1),
                 'created_at' => now(),
                 'updated_at' => now(),
             ],
             [
                 'title' => 'خصومات المدارس للعام الجديد',
-                'start_date' => '2025-07-01 00:00:00',
-                'end_date' => '2025-09-30 23:59:59',
+                'start_date' => now(),
+                'end_date' => now()->addMonth(2),
                 'created_at' => now(),
                 'updated_at' => now(),
             ],
             [
                 'title' => 'تخفيضات السيارات المستعملة',
-                'start_date' => '2025-05-15 00:00:00',
-                'end_date' => '2025-07-15 23:59:59',
+               'start_date' => now(),
+                'end_date' => now()->addMonth(2),
                 'created_at' => now(),
                 'updated_at' => now(),
             ],
             [
                 'title' => 'عروض الأجهزة الإلكترونية',
-                'start_date' => '2025-06-10 00:00:00',
-                'end_date' => '2025-07-10 23:59:59',
+                'start_date' => now(),
+                'end_date' => now()->addMonth(3),
                 'created_at' => now(),
                 'updated_at' => now(),
             ],
-        ]);
+        ];
+
+        foreach ($ads as $adData) {
+            $ad = Ad::create($adData);
+
+            // Add a fake online image using Spatie Media Library
+            $ad->addMediaFromUrl('https://picsum.photos/800/600')
+                ->toMediaCollection('images');
+        }
     }
 }

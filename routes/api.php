@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\AdController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\SearchController;
@@ -11,5 +12,5 @@ Route::get('/home/products' , HomePageController::class);
 Route::get('/products/{product:slug}' , ProductController::class);
 Route::get('/search/filters' , [SearchController::class , 'getFilters']);
 Route::get('/search' , [SearchController::class , 'search']);
-
+Route::get('/ads' , AdController::class);
 Route::get('/school/classes/{schoolClass}' , SchoolClassController::class);
