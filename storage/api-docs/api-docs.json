@@ -152,13 +152,13 @@
                 }
             }
         },
-        "/api/search/filter": {
+        "/api/search/filters": {
             "get": {
                 "tags": [
                     "Search"
                 ],
                 "summary": "Get filters for a specific product type",
-                "operationId": "c13bb273cd5dbad3ca924bc88b8eb62b",
+                "operationId": "c84172dc4f5586c9e7501177135f380c",
                 "parameters": [
                     {
                         "name": "type",

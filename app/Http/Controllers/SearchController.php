@@ -18,7 +18,7 @@ class SearchController extends Controller
 {
     /**
      * @OA\Get(
-     *     path="/api/search/filter",
+     *     path="/api/search/filters",
      *     summary="Get filters for a specific product type",
      *     tags={"Search"},
      *     @OA\Parameter(
