@@ -1,0 +1,669 @@
+{
+    "openapi": "3.0.0",
+    "info": {
+        "title": "Rahtak Software Api ",
+        "description": "API Description",
+        "version": "1.0.0"
+    },
+    "paths": {
+        "/api/home/products": {
+            "get": {
+                "tags": [
+                    "HomePage"
+                ],
+                "summary": "Get products for the homepage",
+                "description": "Retrieve a list of products with optional filters for urgency and discount",
+                "operationId": "getHomePageProducts",
+                "parameters": [
+                    {
+                        "name": "isUrgent",
+                        "in": "query",
+                        "description": "Filter products by urgency",
+                        "required": false,
+                        "schema": {
+                            "type": "boolean"
+                        }
+                    },
+                    {
+                        "name": "discount",
+                        "in": "query",
+                        "description": "Filter products by discount availability",
+                        "required": false,
+                        "schema": {
+                            "type": "boolean"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful operation",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "$ref": "#/components/schemas/ProductResource"
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid input"
+                    }
+                }
+            }
+        },
+        "/api/products/{product}": {
+            "get": {
+                "tags": [
+                    "Products"
+                ],
+                "summary": "Get a product by ID",
+                "description": "Returns a single product with related media, farm, estate, car, school, and electronic data",
+                "operationId": "getProductById",
+                "parameters": [
+                    {
+                        "name": "product",
+                        "in": "path",
+                        "description": "ID of the product to return",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "format": "int64"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful operation",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ProductResource"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Product not found"
+                    }
+                }
+            }
+        },
+        "/api/school/classes/{schoolClass}": {
+            "get": {
+                "tags": [
+                    "School Classes"
+                ],
+                "summary": "Get a school class by ID",
+                "operationId": "1aa9e87cdb7942f71aa1575cbd735af1",
+                "parameters": [
+                    {
+                        "name": "schoolClass",
+                        "in": "path",
+                        "description": "ID of the school class",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful operation",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/SchoolClassResource"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "School class not found"
+                    }
+                }
+            }
+        },
+        "/api/search/filter": {
+            "get": {
+                "tags": [
+                    "Search"
+                ],
+                "summary": "Get filters for a specific product type",
+                "operationId": "c13bb273cd5dbad3ca924bc88b8eb62b",
+                "parameters": [
+                    {
+                        "name": "type",
+                        "in": "query",
+                        "description": "The type of product to filter",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "enum": [
+                                "ESTATE",
+                                "CAR",
+                                "SCHOOL",
+                                "ELECTRONIC",
+                                "BUILDING"
+                            ]
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful operation",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "additionalProperties": {
+                                        "type": "array",
+                                        "items": {
+                                            "type": "string"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid input"
+                    }
+                }
+            }
+        },
+        "/api/search": {
+            "get": {
+                "tags": [
+                    "Search"
+                ],
+                "summary": "Search for products based on type and filters",
+                "operationId": "2754ee3c6371023cefd5b35cf65e9e07",
+                "parameters": [
+                    {
+                        "name": "type",
+                        "in": "query",
+                        "description": "The type of product to search for",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "enum": [
+                                "ESTATE",
+                                "CAR",
+                                "SCHOOL",
+                                "ELECTRONIC",
+                                "BUILDING"
+                            ]
+                        }
+                    },
+                    {
+                        "name": "text",
+                        "in": "query",
+                        "description": "Text to search in product title or address",
+                        "required": false,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "filters",
+                        "in": "query",
+                        "description": "Filters to apply to the search",
+                        "required": false,
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "type": "array",
+                                "items": {
+                                    "type": "string"
+                                }
+                            }
+                        }
+                    },
+                    {
+                        "name": "perPage",
+                        "in": "query",
+                        "description": "Number of items per page",
+                        "required": false,
+                        "schema": {
+                            "type": "integer",
+                            "default": 15
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful operation",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "$ref": "#/components/schemas/ProductResource"
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid input"
+                    }
+                }
+            }
+        }
+    },
+    "components": {
+        "schemas": {
+            "CarResource": {
+                "title": "Car Resource",
+                "description": "Car resource representation",
+                "properties": {
+                    "id": {
+                        "description": "The ID of the car",
+                        "type": "integer"
+                    },
+                    "model": {
+                        "description": "The model of the car",
+                        "type": "string"
+                    },
+                    "year": {
+                        "description": "The manufacturing year of the car",
+                        "type": "integer"
+                    },
+                    "kilo": {
+                        "description": "The mileage of the car in kilometers",
+                        "type": "integer"
+                    }
+                },
+                "type": "object"
+            },
+            "ElectronicResource": {
+                "title": "Electronic Resource",
+                "description": "Electronic resource representation",
+                "properties": {
+                    "id": {
+                        "description": "The ID of the electronic item",
+                        "type": "integer"
+                    },
+                    "model": {
+                        "description": "The model of the electronic item",
+                        "type": "string"
+                    },
+                    "brand": {
+                        "description": "The brand of the electronic item",
+                        "type": "string"
+                    },
+                    "year": {
+                        "description": "The year of the electronic item",
+                        "type": "integer"
+                    }
+                },
+                "type": "object"
+            },
+            "EstateResource": {
+                "title": "Estate Resource",
+                "description": "Estate resource representation",
+                "properties": {
+                    "id": {
+                        "description": "The ID of the estate",
+                        "type": "integer"
+                    },
+                    "rooms": {
+                        "description": "Number of rooms in the estate",
+                        "type": "integer"
+                    },
+                    "area": {
+                        "description": "Area of the estate in square meters",
+                        "type": "number",
+                        "format": "float"
+                    },
+                    "floorsNumber": {
+                        "description": "Number of floors in the estate",
+                        "type": "integer"
+                    },
+                    "isFurnished": {
+                        "description": "Indicates if the estate is furnished",
+                        "type": "boolean"
+                    },
+                    "floor": {
+                        "description": "Floor number of the estate",
+                        "type": "integer"
+                    }
+                },
+                "type": "object"
+            },
+            "FarmResource": {
+                "title": "Farm Resource",
+                "description": "Farm resource representation",
+                "properties": {
+                    "id": {
+                        "description": "The ID of the farm",
+                        "type": "integer"
+                    },
+                    "type": {
+                        "description": "The type of the farm",
+                        "type": "string"
+                    },
+                    "bedrooms": {
+                        "description": "The number of bedrooms in the farm",
+                        "type": "integer"
+                    },
+                    "bathrooms": {
+                        "description": "The number of bathrooms in the farm",
+                        "type": "integer"
+                    },
+                    "floorsNumber": {
+                        "description": "The number of floors in the farm",
+                        "type": "integer"
+                    },
+                    "size": {
+                        "description": "The size of the farm",
+                        "type": "integer"
+                    }
+                },
+                "type": "object"
+            },
+            "MediaResource": {
+                "title": "MediaResource",
+                "description": "Media resource representation for files and images",
+                "required": [
+                    "id",
+                    "name",
+                    "fileName",
+                    "collection",
+                    "url",
+                    "size",
+                    "type",
+                    "extension",
+                    "caption"
+                ],
+                "properties": {
+                    "id": {
+                        "description": "Unique identifier for the media",
+                        "type": "integer",
+                        "format": "int64",
+                        "example": 1
+                    },
+                    "name": {
+                        "description": "Name of the media file without extension",
+                        "type": "string",
+                        "example": "nature_photo"
+                    },
+                    "fileName": {
+                        "description": "Complete file name with extension",
+                        "type": "string",
+                        "example": "nature_photo.jpg"
+                    },
+                    "collection": {
+                        "description": "Collection name where the media is stored",
+                        "type": "string",
+                        "example": "photos"
+                    },
+                    "url": {
+                        "description": "Full URL to access the media file",
+                        "type": "string",
+                        "format": "uri",
+                        "example": "https://example.com/storage/media/nature_photo.jpg"
+                    },
+                    "size": {
+                        "description": "Human-readable file size",
+                        "type": "string",
+                        "example": "2.5 MB"
+                    },
+                    "type": {
+                        "description": "Type of media",
+                        "type": "string",
+                        "enum": [
+                            "image",
+                            "video",
+                            "document",
+                            "audio",
+                            "other"
+                        ],
+                        "example": "image"
+                    },
+                    "extension": {
+                        "description": "File extension",
+                        "type": "string",
+                        "example": "jpg"
+                    },
+                    "caption": {
+                        "description": "Caption or description of the media. Falls back to name if not set",
+                        "type": "string",
+                        "example": "Beautiful nature photograph"
+                    },
+                    "width": {
+                        "description": "Width of the image in pixels (only for images)",
+                        "type": "integer",
+                        "format": "int32",
+                        "example": 1920,
+                        "nullable": true
+                    },
+                    "height": {
+                        "description": "Height of the image in pixels (only for images)",
+                        "type": "integer",
+                        "format": "int32",
+                        "example": 1080,
+                        "nullable": true
+                    },
+                    "thumbnailUrl": {
+                        "description": "URL of the thumbnail version. Only present if 'thumb' conversion exists",
+                        "type": "string",
+                        "format": "uri",
+                        "example": "https://example.com/storage/media/conversions/nature_photo-thumb.jpg",
+                        "nullable": true
+                    }
+                },
+                "type": "object"
+            },
+            "ProductResource": {
+                "title": "Product Resource",
+                "description": "Product resource representation",
+                "properties": {
+                    "id": {
+                        "description": "The ID of the product",
+                        "type": "integer"
+                    },
+                    "title": {
+                        "description": "The title of the product",
+                        "type": "string"
+                    },
+                    "slug": {
+                        "description": "The slug of the product",
+                        "type": "string"
+                    },
+                    "description": {
+                        "description": "The description of the product",
+                        "type": "string"
+                    },
+                    "price": {
+                        "description": "The price of the product",
+                        "type": "number",
+                        "format": "float"
+                    },
+                    "isUrgent": {
+                        "description": "Indicates if the product is urgent",
+                        "type": "boolean"
+                    },
+                    "discount": {
+                        "description": "The discount applied to the product",
+                        "type": "number",
+                        "format": "float"
+                    },
+                    "view": {
+                        "description": "The number of views of the product",
+                        "type": "integer"
+                    },
+                    "address": {
+                        "description": "The address of the product",
+                        "type": "string"
+                    },
+                    "estate": {
+                        "$ref": "#/components/schemas/EstateResource"
+                    },
+                    "school": {
+                        "$ref": "#/components/schemas/SchoolResource"
+                    },
+                    "car": {
+                        "$ref": "#/components/schemas/CarResource"
+                    },
+                    "electronic": {
+                        "$ref": "#/components/schemas/ElectronicResource"
+                    },
+                    "farm": {
+                        "$ref": "#/components/schemas/FarmResource"
+                    },
+                    "video": {
+                        "$ref": "#/components/schemas/MediaResource"
+                    },
+                    "primaryImage": {
+                        "$ref": "#/components/schemas/MediaResource"
+                    },
+                    "images": {
+                        "description": "The images associated with the product",
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/MediaResource"
+                        }
+                    }
+                },
+                "type": "object"
+            },
+            "SchoolClassResource": {
+                "title": "School Class Resource",
+                "description": "School Class Resource",
+                "properties": {
+                    "id": {
+                        "description": "The ID of the school class",
+                        "type": "integer"
+                    },
+                    "name": {
+                        "description": "The name of the school class",
+                        "type": "string"
+                    },
+                    "type": {
+                        "description": "The type of the school class",
+                        "type": "string"
+                    },
+                    "teachers": {
+                        "description": "List of teachers in the school class",
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/TeacherResource"
+                        }
+                    },
+                    "images": {
+                        "description": "List of images associated with the school class",
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/MediaResource"
+                        }
+                    },
+                    "videos": {
+                        "$ref": "#/components/schemas/MediaResource"
+                    }
+                },
+                "type": "object"
+            },
+            "SchoolResource": {
+                "title": "School Resource",
+                "description": "School resource representation",
+                "properties": {
+                    "id": {
+                        "description": "The ID of the school",
+                        "type": "integer"
+                    },
+                    "quate": {
+                        "description": "The quote of the school",
+                        "type": "string"
+                    },
+                    "workingDuration": {
+                        "description": "The working duration of the school",
+                        "type": "string"
+                    },
+                    "foundingDate": {
+                        "description": "The founding date of the school",
+                        "type": "string",
+                        "format": "date"
+                    },
+                    "address": {
+                        "description": "The address of the school",
+                        "type": "string"
+                    },
+                    "manager": {
+                        "description": "The manager of the school",
+                        "type": "string"
+                    },
+                    "managerDescription": {
+                        "description": "The description of the manager",
+                        "type": "string"
+                    },
+                    "schoolClasses": {
+                        "description": "The list of school classes",
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/SchoolClassResource"
+                        }
+                    },
+                    "managerImage": {
+                        "$ref": "#/components/schemas/MediaResource"
+                    },
+                    "servicesImages": {
+                        "description": "The list of service images",
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/MediaResource"
+                        }
+                    }
+                },
+                "type": "object"
+            },
+            "TeacherResource": {
+                "title": "Teacher Resource",
+                "description": "Teacher resource representation",
+                "properties": {
+                    "id": {
+                        "description": "The ID of the teacher",
+                        "type": "integer"
+                    },
+                    "name": {
+                        "description": "The name of the teacher",
+                        "type": "string"
+                    },
+                    "school_id": {
+                        "description": "The ID of the school the teacher belongs to",
+                        "type": "integer"
+                    },
+                    "jobTitle": {
+                        "description": "The job title of the teacher",
+                        "type": "string"
+                    },
+                    "image": {
+                        "$ref": "#/components/schemas/MediaResource"
+                    }
+                },
+                "type": "object"
+            }
+        }
+    },
+    "tags": [
+        {
+            "name": "HomePage",
+            "description": "Operations related to the homepage products"
+        },
+        {
+            "name": "Products",
+            "description": "Products"
+        },
+        {
+            "name": "School Classes",
+            "description": "School Classes"
+        },
+        {
+            "name": "Search",
+            "description": "Search"
+        }
+    ]
+}
