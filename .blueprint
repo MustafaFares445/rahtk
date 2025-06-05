@@ -1,0 +1,46 @@
+created:
+    - database/factories/ProductFactory.php
+    - database/factories/SchoolFactory.php
+    - database/factories/ClassFactory.php
+    - database/factories/TeacherFactory.php
+    - database/factories/ClassTeacherFactory.php
+    - database/factories/FarmFactory.php
+    - database/factories/CarFactory.php
+    - database/factories/EstateFactory.php
+    - database/factories/AdFactory.php
+    - database/factories/ElectronicFactory.php
+    - database/factories/BuildingFactory.php
+    - database/migrations/2025_06_02_205724_create_products_table.php
+    - database/migrations/2025_06_02_205725_create_schools_table.php
+    - database/migrations/2025_06_02_205726_create_classes_table.php
+    - database/migrations/2025_06_02_205727_create_teachers_table.php
+    - database/migrations/2025_06_02_205728_create_class_teachers_table.php
+    - database/migrations/2025_06_02_205729_create_farms_table.php
+    - database/migrations/2025_06_02_205730_create_cars_table.php
+    - database/migrations/2025_06_02_205731_create_estates_table.php
+    - database/migrations/2025_06_02_205732_create_ads_table.php
+    - database/migrations/2025_06_02_205733_create_electronics_table.php
+    - database/migrations/2025_06_02_205734_create_buildings_table.php
+    - app/Models/Product.php
+    - app/Models/School.php
+    - app/Models/Class.php
+    - app/Models/Teacher.php
+    - app/Models/ClassTeacher.php
+    - app/Models/Farm.php
+    - app/Models/Car.php
+    - app/Models/Estate.php
+    - app/Models/Ad.php
+    - app/Models/Electronic.php
+    - app/Models/Building.php
+models:
+    Product: { id: id, title: string, slug: string, description: longText, price: bigInteger, is_urgent: bigInteger, discount: bigInteger, view: 'bigInteger unsigned' }
+    School: { id: id, product_id: 'bigInteger index foreign:products.id', name: bigInteger, principal: 'string nullable', working_duration: string, founding_date: bigInteger, address: string, manager: string, manager_description: text }
+    Class: { id: id, name: string, type: 'enum:"initial","principal","secondary" primary', school_id: 'bigInteger index foreign:schools.id' }
+    Teacher: { id: id, name: bigInteger, school_id: 'bigInteger index foreign:schools.id', job_title: string }
+    ClassTeacher: { id: false, teacher_id: 'bigIncrements index foreign:teachers.id', class_id: 'bigInteger index foreign:classes.id', indexes: [{ primary: 'teacher_id, class_id' }] }
+    Farm: { id: id, product_id: 'bigInteger index foreign:products.id', type: 'enum:"sell","rent"', address: string, bedrooms: 'smallInteger unsigned', bathrooms: smallInteger, floors: smallInteger, size: 'integer unsigned' }
+    Car: { id: id, product_id: 'bigInteger index foreign:products.id', model: string, year: bigInteger, kilo: integer }
+    Estate: { id: id, product_id: 'bigInteger index foreign:products.id', rooms: smallInteger, area: decimal, floors_number: integer, is_furnished: boolean, address: string, floor: string }
+    Ad: { id: id, title: string, start_date: dateTime, end_date: dateTime }
+    Electronic: { id: id, product_id: 'bigInteger index foreign:products.id', model: string, brand: string, year: string }
+    Building: { id: id, product_id: 'string index foreign:products.id', type: string, brand: string, options: string }

@@ -1,0 +1,77 @@
+models:
+    Product:
+        id: id
+        title: string
+        slug: string
+        description: longText
+        price: bigInteger
+        is_urgent: bigInteger
+        discount: bigInteger
+        view: bigInteger unsigned
+    School:
+        id: id
+        product_id: bigInteger index foreign:products.id
+        name: bigInteger
+        principal: string nullable
+        working_duration: string
+        founding_date: bigInteger
+        address: string
+        manager: string
+        manager_description: text
+    Class:
+        id: id
+        name: string
+        type: enum:"initial","principal","secondary" primary
+        school_id: bigInteger index foreign:schools.id
+    Teacher:
+        id: id
+        name: bigInteger
+        school_id: bigInteger index foreign:schools.id
+        job_title: string
+    ClassTeacher:
+        id: false
+        teacher_id: bigIncrements index foreign:teachers.id
+        class_id: bigInteger index foreign:classes.id
+        indexes:
+            - primary: teacher_id, class_id
+    Farm:
+        id: id
+        product_id: bigInteger index foreign:products.id
+        type: enum:"sell","rent"
+        address: string
+        bedrooms: smallInteger unsigned
+        bathrooms: smallInteger
+        floors: smallInteger
+        size: integer unsigned
+    Car:
+        id: id
+        product_id: bigInteger index foreign:products.id
+        model: string
+        year: bigInteger
+        kilo: integer
+    Estate:
+        id: id
+        product_id: bigInteger index foreign:products.id
+        rooms: smallInteger
+        area: decimal
+        floors_number: integer
+        is_furnished: boolean
+        address: string
+        floor: string
+    Ad:
+        id: id
+        title: string
+        start_date: dateTime
+        end_date: dateTime
+    Electronic:
+        id: id
+        product_id: bigInteger index foreign:products.id
+        model: string
+        brand: string
+        year: string
+    Building:
+        id: id
+        product_id: string index foreign:products.id
+        type: string
+        brand: string
+        options: string
