@@ -93,11 +93,10 @@
                     {
                         "name": "product",
                         "in": "path",
-                        "description": "ID of the product to return",
+                        "description": "slug of the product to return",
                         "required": true,
                         "schema": {
-                            "type": "integer",
-                            "format": "int64"
+                            "type": "string"
                         }
                     }
                 ],

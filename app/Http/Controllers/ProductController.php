@@ -17,12 +17,9 @@ class ProductController extends Controller
      *     @OA\Parameter(
      *         name="product",
      *         in="path",
-     *         description="ID of the product to return",
+     *         description="slug of the product to return",
      *         required=true,
-     *         @OA\Schema(
-     *             type="integer",
-     *             format="int64"
-     *         )
+     *         @OA\Schema(type="string")
      *     ),
      *     @OA\Response(
      *         response=200,
