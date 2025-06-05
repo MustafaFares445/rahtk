@@ -6,6 +6,33 @@
         "version": "1.0.0"
     },
     "paths": {
+        "/api/ads": {
+            "get": {
+                "tags": [
+                    "Ads"
+                ],
+                "summary": "Get all active ads",
+                "operationId": "239783e848a702c6aaba9101973ea9fc",
+                "responses": {
+                    "200": {
+                        "description": "Successful operation",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "$ref": "#/components/schemas/AdResource"
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error"
+                    }
+                }
+            }
+        },
         "/api/home/products": {
             "get": {
                 "tags": [
@@ -256,6 +283,24 @@
     },
     "components": {
         "schemas": {
+            "AdResource": {
+                "title": "Ad Resource",
+                "description": "Ad resource representation",
+                "properties": {
+                    "id": {
+                        "description": "The ID of the ad",
+                        "type": "integer"
+                    },
+                    "title": {
+                        "description": "The title of the ad",
+                        "type": "string"
+                    },
+                    "image": {
+                        "$ref": "#/components/schemas/MediaResource"
+                    }
+                },
+                "type": "object"
+            },
             "CarResource": {
                 "title": "Car Resource",
                 "description": "Car resource representation",
@@ -652,6 +697,10 @@
         {
             "name": "HomePage",
             "description": "Operations related to the homepage products"
+        },
+        {
+            "name": "Ads",
+            "description": "Ads"
         },
         {
             "name": "Products",
