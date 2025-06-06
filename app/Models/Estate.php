@@ -25,7 +25,7 @@ class Estate extends Model
     ];
 
     protected $casts = [
-        'area' => 'double '
+        'area' => 'double'
     ];
 
     public function product(): BelongsTo

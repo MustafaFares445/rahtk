@@ -8,6 +8,7 @@ use Spatie\Sluggable\SlugOptions;
 use Illuminate\Database\Eloquent\Model;
 use Spatie\MediaLibrary\InteractsWithMedia;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use PhpParser\Node\Expr\FuncCall;
 
 class Product extends Model implements HasMedia
 {
@@ -63,5 +64,10 @@ class Product extends Model implements HasMedia
     public function farm()
     {
         return $this->hasOne(Farm::class);
+    }
+
+    public function building()
+    {
+        return $this->hasOne(Building::class);
     }
 }

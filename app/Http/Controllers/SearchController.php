@@ -174,7 +174,7 @@ class SearchController extends Controller
     {
         $request->validate([
             'type' => ['required', 'string', Rule::in(array_map(fn($case) => $case->value, ProductTypes::cases()))],
-        ]);
+        ]); 
 
         $productsQuery = Product::with(['media' , 'farm' , 'estate' , 'car' , 'school' , 'electronic']);
 
