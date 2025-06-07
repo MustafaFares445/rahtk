@@ -20,26 +20,33 @@ class HomePageController extends Controller
      * @OA\Get(
      *     path="/api/home/products",
      *     summary="Get products for the homepage",
-     *     description="Retrieve a list of products with optional filters for urgency and discount",
+     *     description="Retrieve a list of products with optional filters for urgency, discount, and type.",
      *     operationId="getHomePageProducts",
      *     tags={"HomePage"},
      *     @OA\Parameter(
      *         name="isUrgent",
      *         in="query",
-     *         description="Filter products by urgency",
+     *         description="Filter products by urgency. If true, only urgent products are returned.",
      *         required=false,
      *         @OA\Schema(type="boolean")
      *     ),
      *     @OA\Parameter(
      *         name="discount",
      *         in="query",
-     *         description="Filter products by discount availability",
+     *         description="Filter products by discount availability. If true, only products with discounts are returned.",
      *         required=false,
      *         @OA\Schema(type="boolean")
      *     ),
+     *     @OA\Parameter(
+     *         name="type",
+     *         in="query",
+     *         description="Filter products by type. Must be one of the valid product types.",
+     *         required=false,
+     *         @OA\Schema(type="string", enum={"farm", "estate", "car", "school", "electronic"})
+     *     ),
      *     @OA\Response(
      *         response=200,
-     *         description="Successful operation",
+     *         description="Successful operation. Returns a list of products.",
      *         @OA\JsonContent(
      *             type="array",
      *             @OA\Items(ref="#/components/schemas/ProductResource")
@@ -47,7 +54,7 @@ class HomePageController extends Controller
      *     ),
      *     @OA\Response(
      *         response=400,
-     *         description="Invalid input"
+     *         description="Invalid input. At least one of isUrgent or discount is required, or the provided type is invalid."
      *     )
      * )
      */
