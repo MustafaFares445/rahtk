@@ -43,6 +43,9 @@ class SchoolSeeder extends Seeder
 
             $schoolRecord->addMediaFromUrl('https://picsum.photos/200/300')
                          ->toMediaCollection('managers-images');
+
+            $schoolRecord->addMediaFromUrl('https://picsum.photos/200/300')
+                         ->toMediaCollection('services-images');
         }
     }
 }

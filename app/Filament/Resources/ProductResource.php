@@ -2,42 +2,49 @@
 
 namespace App\Filament\Resources;
 
-use Filament\Forms;
-use Filament\Tables;
-use App\Models\Product;
-use Filament\Forms\Form;
-use Filament\Tables\Table;
 use App\Enums\ProductTypes;
-use Filament\Resources\Resource;
-use Illuminate\Support\HtmlString;
-use Illuminate\Support\Facades\Blade;
+use App\Models\Product;
 use App\Filament\Resources\ProductResource\Pages;
+use Filament\Forms;
 use Filament\Forms\Components\Section;
+use Filament\Forms\Form;
+use Filament\Resources\Resource;
+use Filament\Tables;
+use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Support\Facades\Blade;
+use Illuminate\Support\HtmlString;
 
 class ProductResource extends Resource
 {
     protected static ?string $model = Product::class;
     protected static ?string $navigationIcon = 'heroicon-o-shopping-bag';
+    protected static ?string $navigationLabel = 'Products';
+    protected static ?string $modelLabel = 'Product';
+    protected static ?string $recordTitleAttribute = 'title';
 
     private static array $typeFieldMappings = [
         'estate' => 'getEstateFields',
-        'school' => 'getSchoolFields',
         'car' => 'getCarFields',
         'electronic' => 'getElectronicFields',
         'farm' => 'getFarmFields',
         'building' => 'getBuildingFields',
     ];
 
-    // Badge colors for product types
     private static array $typeBadgeColors = [
         'estate' => 'primary',
-        'school' => 'success',
         'car' => 'warning',
         'electronic' => 'danger',
         'farm' => 'info',
         'building' => 'gray',
     ];
+
+    public static function form(Form $form): Form
+    {
+        return $form->schema([
+            self::buildMainFormSections(),
+        ]);
+    }
 
     public static function table(Table $table): Table
     {
@@ -45,28 +52,20 @@ class ProductResource extends Resource
             ->columns(self::getTableColumns())
             ->filters(self::getTableFilters())
             ->actions([
-                Tables\Actions\EditAction::make(),
-                Tables\Actions\DeleteAction::make(),
+                Tables\Actions\EditAction::make()
+                    ->icon('heroicon-o-pencil'),
+                Tables\Actions\DeleteAction::make()
+                    ->icon('heroicon-o-trash'),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
                     Tables\Actions\DeleteBulkAction::make(),
                 ]),
             ])
-            ->modifyQueryUsing(fn (Builder $query) => $query->with([
-                'media' => function ($query) {
-                    $query->where('collection_name', 'images')->limit(1);
-                }
-            ]));
-    }
-
-    public static function form(Form $form): Form
-    {
-        return $form->schema([
-            ...self::getCommonFields(),
-            ...self::getMediaFields(),
-            ...self::getTypeSpecificFields(),
-        ]);
+            ->modifyQueryUsing(fn (Builder $query) => $query->where('type' , '!=' , ProductTypes::SCHOOL->value)->with([
+                'media' => fn ($query) => $query->where('collection_name', 'images')->limit(1)
+            ]))
+            ->defaultSort('created_at', 'desc');
     }
 
     public static function getPages(): array
@@ -88,111 +87,131 @@ class ProductResource extends Resource
         }
     }
 
-    private static function getCommonFields(): array
+    /* ==================== FORM BUILDERS ==================== */
+
+    private static function buildMainFormSections(): Forms\Components\Grid
     {
-        return [
-            Forms\Components\TextInput::make('title')
-                ->required()
-                ->maxLength(255),
+        return Forms\Components\Grid::make()
+            ->schema([
+                // Left column - Product Details and Type-Specific Fields
+                Forms\Components\Section::make()
+                    ->schema([
+                        self::getProductDetailsSection(),
+                        self::getTypeSpecificFields(),
+                    ])
+                    ->columnSpan(['lg' => 2]),
 
-            Forms\Components\TextInput::make('address')
-                ->required()
-                ->maxLength(255),
-
-            Forms\Components\Toggle::make('is_urgent')
-                ->default(false),
-
-            Forms\Components\Textarea::make('description')
-                ->required()
-                ->columnSpanFull(),
-
-            Forms\Components\TextInput::make('price')
-                ->required()
-                ->numeric(),
-
-            Forms\Components\TextInput::make('discount')
-                ->numeric(),
-
-
-            Forms\Components\Select::make('type')
-                ->options(ProductTypes::class)
-                ->required()
-                ->enum(ProductTypes::class)
-                ->live()
-                ->afterStateUpdated(fn($state, Forms\Set $set) => $set('relationship_data', null))
-                ->hint(self::getLoadingIndicator()),
-        ];
+                // Right column - Media Section
+                self::getMediaSection()
+                    ->columnSpan(['lg' => 1]),
+            ])
+            ->columns([
+                'default' => 1,
+                'lg' => 3,
+            ]);
     }
 
-    private static function getMediaFields(): array
+    private static function getProductDetailsSection(): Section
     {
-        return [
-            Forms\Components\Section::make('Media')
-                ->schema([
-                    // Existing Images Display
-                    Forms\Components\Placeholder::make('existing_images')
-                        ->label('Current Images')
-                        ->visible(fn ($record) => $record && $record->getMedia('images')->count() > 0),
+        return Section::make('Product Details')
+            ->schema([
+                Forms\Components\TextInput::make('title')
+                    ->required()
+                    ->maxLength(255)
+                    ->columnSpanFull()
+                    ->placeholder('Enter product title'),
 
-                    // New Images Upload
-                    Forms\Components\FileUpload::make('new_images')
-                        ->label('Upload New Images')
-                        ->image()
-                        ->multiple()
-                        ->directory('products')
-                        ->preserveFilenames()
-                        ->acceptedFileTypes(['image/jpeg', 'image/jpg', 'image/png', 'image/gif', 'image/webp'])
-                        ->maxSize(10240) // 10MB max per image
-                        ->maxFiles(10)
-                        ->reorderable(),
+                Forms\Components\Textarea::make('description')
+                    ->required()
+                    ->columnSpanFull()
+                    ->rows(3)
+                    ->placeholder('Detailed product description'),
 
-                    // Existing Videos Display
-                    Forms\Components\Placeholder::make('existing_videos')
-                        ->label('Current Videos')
-                        ->visible(fn ($record) => $record && $record->getMedia('videos')->count() > 0),
+                Forms\Components\TextInput::make('price')
+                    ->required()
+                    ->numeric()
+                    ->prefix('$')
+                    ->minValue(0)
+                    ->step(0.01),
 
-                    // New Video Upload
-                    Forms\Components\FileUpload::make('new_video')
-                        ->label('Upload New Video')
-                        ->acceptedFileTypes(['video/mp4', 'video/quicktime', 'video/x-msvideo', 'video/x-ms-wmv', 'video/webm'])
-                        ->directory('products/videos')
-                        ->preserveFilenames()
-                        ->maxSize(102400), // 100MB max
-                ])
-                ->columnSpanFull(),
-        ];
+                Forms\Components\TextInput::make('discount')
+                    ->numeric()
+                    ->prefix('%')
+                    ->minValue(0)
+                    ->maxValue(100)
+                    ->step(0.1),
+
+                Forms\Components\TextInput::make('address')
+                    ->required()
+                    ->maxLength(255)
+                    ->columnSpanFull()
+                    ->placeholder('Product location address'),
+
+                Forms\Components\Select::make('type')
+                    ->options(
+                        collect(ProductTypes::cases())
+                            ->filter(fn($type) => $type->value !== 'school')
+                            ->mapWithKeys(fn($type) => [$type->value => ucfirst($type->value)])
+                            ->toArray()
+                    )
+                    ->required()
+                    ->enum(ProductTypes::class)
+                    ->live()
+                    ->native(false)
+                    ->afterStateUpdated(fn($state, Forms\Set $set) => $set('relationship_data', null))
+                    ->hint(self::getLoadingIndicator()),
+
+                Forms\Components\Toggle::make('is_urgent')
+                    ->label('Mark as Urgent')
+                    ->default(false)
+                    ->inline(false)
+                    ->helperText('Highlight this product as urgent'),
+            ])
+            ->columns(2);
     }
 
-    private static function getLoadingIndicator(): HtmlString
+    private static function getMediaSection(): Section
     {
-        return new HtmlString(Blade::render(
-            '<x-filament::loading-indicator class="h-5 w-5 text-gray-500 inline-block" wire:loading wire:target="data.type" />'
-        ));
+        return Section::make('Media & Attachments')
+            ->schema([
+                Forms\Components\SpatieMediaLibraryFileUpload::make('images')
+                    ->collection('images')
+                    ->image()
+                    ->multiple()
+                    ->preserveFilenames()
+                    ->required()
+                    ->label('Product Images')
+                    ->acceptedFileTypes(['image/jpeg', 'image/png', 'image/gif', 'image/webp'])
+                    ->helperText('Upload product images (JPEG, PNG, GIF, WebP)')
+                    ->reorderable()
+                    ->imagePreviewHeight('150')
+                    ->columnSpanFull()
+                    ->downloadable()
+                    ->openable(),
+
+                Forms\Components\SpatieMediaLibraryFileUpload::make('video')
+                    ->collection('videos')
+                    ->acceptedFileTypes(['video/mp4', 'video/quicktime', 'video/x-msvideo', 'video/x-ms-wmv'])
+                    ->preserveFilenames()
+                    ->label('Product Video')
+                    ->helperText('Optional product video (MP4, MOV, AVI, WMV)')
+                    ->columnSpanFull()
+                    ->downloadable(),
+            ]);
     }
 
-    private static function getTypeSpecificFields(): array
-    {
-        return [
-            Forms\Components\Group::make()
-                ->schema([
-                    self::getLoadingPlaceholder(),
-                    Forms\Components\Group::make()
-                        ->schema(fn(Forms\Get $get) => self::getFieldsForType($get('type')))
-                        ->hidden(fn(Forms\Get $get) => !$get('type')),
-                ])
-        ];
-    }
+    /* ==================== TYPE-SPECIFIC FIELDS ==================== */
 
-    private static function getLoadingPlaceholder(): Forms\Components\Placeholder
+    private static function getTypeSpecificFields(): Forms\Components\Group
     {
-        return Forms\Components\Placeholder::make('loading')
-            ->hidden()
-            ->content(new HtmlString(
-                '<div wire:loading wire:target="data.type" class="flex items-center space-x-2">
-                    <x-filament::loading-indicator class="h-5 w-5 text-gray-600" />
-                    <span>Loading fields…</span>
-                 </div>'
-            ));
+        return Forms\Components\Group::make()
+            ->schema([
+                self::getLoadingPlaceholder(),
+                Forms\Components\Group::make()
+                    ->schema(fn(Forms\Get $get) => self::getFieldsForType($get('type')))
+                    ->hidden(fn(Forms\Get $get) => !$get('type')),
+            ])
+            ->columnSpanFull();
     }
 
     private static function getFieldsForType(?string $type): array
@@ -202,7 +221,6 @@ class ProductResource extends Resource
         }
 
         $methodName = self::$typeFieldMappings[$type];
-
         return [
             Forms\Components\Group::make()
                 ->relationship($type)
@@ -213,183 +231,225 @@ class ProductResource extends Resource
     private static function getEstateFields(): array
     {
         return [
-            Forms\Components\Section::make('Estate Attributes')
-            ->schema([
-                Forms\Components\TextInput::make('rooms')
-                    ->required()
-                    ->numeric(),
-                Forms\Components\TextInput::make('area')
-                    ->required()
-                    ->numeric(),
-                Forms\Components\TextInput::make('floors_number')
-                    ->required()
-                    ->numeric(),
-                Forms\Components\Toggle::make('is_furnished')
-                    ->required(),
-                Forms\Components\TextInput::make('floor')
-                    ->required()
-                    ->numeric(),
-            ])
-
-        ];
-    }
-
-    private static function getSchoolFields(): array
-    {
-       return [
-            Forms\Components\Section::make('School Attributes')
+            Section::make('Real Estate Details')
                 ->schema([
-                    Forms\Components\TextInput::make('quate')
-                        ->nullable()
-                        ->maxLength(255),
-                    Forms\Components\TextInput::make('working_duration')
-                        ->nullable()
-                        ->maxLength(255),
-                    Forms\Components\DatePicker::make('founding_date')
-                        ->required()
-                        ->format('Y-m-d')
-                        ->minDate(now()->subYears(100))
-                        ->maxDate(now()),
-                    Forms\Components\TextInput::make('address')
-                        ->nullable()
-                        ->maxLength(255),
-                    Forms\Components\TextInput::make('manager')
-                        ->required()
-                        ->maxLength(255),
-                    Forms\Components\TextInput::make('manager_description')
-                        ->required()
-                        ->columnSpanFull(),
-            ])
+                    Forms\Components\TextInput::make('rooms')
+                        ->numeric()
+                        ->minValue(1)
+                        ->step(1)
+                        ->label('Rooms'),
+
+                    Forms\Components\TextInput::make('area')
+                        ->numeric()
+                        ->minValue(1)
+                        ->suffix('sq ft')
+                        ->label('Area'),
+
+                    Forms\Components\TextInput::make('floors_number')
+                        ->numeric()
+                        ->minValue(1)
+                        ->step(1)
+                        ->label('Floors'),
+
+                    Forms\Components\Toggle::make('is_furnished')
+                        ->inline(false)
+                        ->label('Furnished'),
+
+                    Forms\Components\TextInput::make('floor')
+                        ->numeric()
+                        ->minValue(0)
+                        ->step(1)
+                        ->label('Floor Number'),
+                ])
+                ->columns(2)
         ];
     }
 
     private static function getCarFields(): array
     {
         return [
-            Forms\Components\Section::make('Car Attributes')
+            Section::make('Vehicle Details')
                 ->schema([
                     Forms\Components\TextInput::make('model')
-                        ->required()
-                        ->maxLength(255),
+                        ->maxLength(255)
+                        ->placeholder('Model name')
+                        ->label('Model'),
+
                     self::getYearField(),
+
                     Forms\Components\TextInput::make('kilo')
-                        ->required()
-                        ->numeric(),
+                        ->numeric()
+                        ->minValue(0)
+                        ->suffix('km')
+                        ->label('Kilometers'),
                 ])
+                ->columns(2)
         ];
     }
 
     private static function getElectronicFields(): array
     {
         return [
-            Section::make('Electronic Attributes')
+            Section::make('Electronic Specifications')
                 ->schema([
                     Forms\Components\TextInput::make('model')
-                    ->required()
-                    ->maxLength(255),
-                Forms\Components\TextInput::make('brand')
-                    ->required()
-                    ->maxLength(255),
+                        ->maxLength(255)
+                        ->placeholder('Model number')
+                        ->label('Model'),
 
-                self::getYearField(),
-            ])
+                    Forms\Components\TextInput::make('brand')
+                        ->maxLength(255)
+                        ->placeholder('Brand name')
+                        ->label('Brand'),
+
+                    self::getYearField(),
+                ])
+                ->columns(2)
         ];
     }
 
     private static function getFarmFields(): array
     {
         return [
-           Section::make('Farm Attributes')
-            ->schema([
-                Forms\Components\TextInput::make('type')
-                ->required()
-                    ->maxLength(255),
-                Forms\Components\TextInput::make('bedrooms')
-                    ->required()
-                    ->numeric(),
-                Forms\Components\TextInput::make('bathrooms')
-                    ->required()
-                    ->numeric(),
-                Forms\Components\TextInput::make('floors_number')
-                    ->required()
-                    ->numeric(),
-                Forms\Components\TextInput::make('size')
-                    ->required()
-                    ->numeric(),
-            ])
+            Section::make('Farm Property Details')
+                ->schema([
+                    Forms\Components\TextInput::make('type')
+                        ->maxLength(255)
+                        ->placeholder('Farm type')
+                        ->label('Farm Type'),
+
+                    Forms\Components\TextInput::make('bedrooms')
+                        ->numeric()
+                        ->minValue(0)
+                        ->step(1)
+                        ->label('Bedrooms'),
+
+                    Forms\Components\TextInput::make('bathrooms')
+                        ->numeric()
+                        ->minValue(0)
+                        ->step(1)
+                        ->label('Bathrooms'),
+
+                    Forms\Components\TextInput::make('floors_number')
+                        ->numeric()
+                        ->minValue(1)
+                        ->step(1)
+                        ->label('Floors'),
+
+                    Forms\Components\TextInput::make('size')
+                        ->numeric()
+                        ->minValue(1)
+                        ->suffix('acres')
+                        ->label('Size'),
+                ])
+                ->columns(2)
         ];
     }
 
     private static function getBuildingFields(): array
     {
         return [
-            Forms\Components\Section::make('Building Attributes')
+            Section::make('Building Specifications')
                 ->schema([
                     Forms\Components\TextInput::make('type')
-                        ->required()
-                        ->maxLength(255),
+                        ->maxLength(255)
+                        ->placeholder('Building type')
+                        ->label('Building Type'),
+
                     Forms\Components\TextInput::make('brand')
-                        ->required()
-                        ->maxLength(255),
+                        ->maxLength(255)
+                        ->placeholder('Construction brand')
+                        ->label('Brand'),
+
                     Forms\Components\TextInput::make('options')
-                        ->required()
-                        ->maxLength(255),
-                ]),
+                        ->maxLength(255)
+                        ->placeholder('Special features')
+                        ->label('Features'),
+                ])
+                ->columns(2)
         ];
     }
 
-    // Reusable components
+    /* ==================== REUSABLE COMPONENTS ==================== */
+
     private static function getYearField(): Forms\Components\DatePicker
     {
         return Forms\Components\DatePicker::make('year')
             ->required()
             ->format('Y')
+            ->displayFormat('Y')
+            ->native(false)
             ->minDate(now()->subYears(100))
-            ->maxDate(now());
+            ->maxDate(now())
+            ->columnSpan(1)
+            ->label('Year');
     }
+
+    private static function getLoadingIndicator(): HtmlString
+    {
+        return new HtmlString(Blade::render(
+            '<x-filament::loading-indicator class="h-4 w-4 text-primary-500 inline-block" wire:loading wire:target="data.type" />'
+        ));
+    }
+
+    private static function getLoadingPlaceholder(): Forms\Components\Placeholder
+    {
+        return Forms\Components\Placeholder::make('loading')
+            ->hidden()
+            ->content(new HtmlString(
+                '<div wire:loading wire:target="data.type" class="flex items-center space-x-2 text-sm text-gray-600 p-2">
+                    <x-filament::loading-indicator class="h-4 w-4" />
+                    <span>Loading product specifications...</span>
+                 </div>'
+            ));
+    }
+
+    /* ==================== TABLE CONFIGURATION ==================== */
 
     private static function getTableColumns(): array
     {
         return [
             Tables\Columns\ImageColumn::make('images')
-                ->label('Primary Image')
+                ->label('')
+                ->size(40)
+                ->circular()
                 ->getStateUsing(fn($record) => $record->getFirstMediaUrl('images')),
 
             Tables\Columns\TextColumn::make('title')
-                ->searchable(),
+                ->searchable()
+                ->sortable()
+                ->weight('medium')
+                ->description(fn($record) => \Illuminate\Support\Str::limit($record->description, 30))
+                ->wrap(),
 
             Tables\Columns\TextColumn::make('type')
-                ->searchable()
                 ->badge()
-                ->color(fn(string $state): string =>
-                    self::$typeBadgeColors[$state] ?? 'secondary'
-                ),
+                ->color(fn(string $state): string => self::$typeBadgeColors[$state] ?? 'secondary')
+                ->formatStateUsing(fn($state) => ucfirst($state))
+                ->sortable(),
 
             Tables\Columns\TextColumn::make('price')
-                ->numeric()
-                ->sortable(),
-
-            Tables\Columns\TextColumn::make('discount')
-                ->numeric()
-                ->sortable(),
-
-            Tables\Columns\TextColumn::make('address')
-                ->searchable(),
+                ->money('USD')
+                ->sortable()
+                ->color(fn($record) => $record->discount ? 'success' : null)
+                ->description(fn($record) => $record->discount ? 'Discounted from $'.number_format($record->price / (1 - $record->discount / 100), 2) : null),
 
             Tables\Columns\IconColumn::make('is_urgent')
-                ->boolean(),
-
-            Tables\Columns\TextColumn::make('view')
-                ->numeric()
+                ->label('Urgent')
+                ->boolean()
+                ->trueIcon('heroicon-o-bolt')
+                ->trueColor('warning')
                 ->sortable(),
 
             Tables\Columns\TextColumn::make('created_at')
-                ->dateTime()
+                ->label('Posted')
                 ->sortable()
-                ->toggleable(isToggledHiddenByDefault: true),
+                ->icon('heroicon-o-calendar')
+                ->color('success')
+                ->dateTime('M d, Y'),
 
-            Tables\Columns\TextColumn::make('updated_at')
-                ->dateTime()
+            Tables\Columns\TextColumn::make('view')
+                ->numeric()
                 ->sortable()
                 ->toggleable(isToggledHiddenByDefault: true),
         ];
@@ -399,34 +459,47 @@ class ProductResource extends Resource
     {
         return [
             Tables\Filters\SelectFilter::make('type')
-                ->options(ProductTypes::class)
-                ->label('Product Type'),
+                ->options(
+                    collect(ProductTypes::cases())
+                        ->mapWithKeys(fn($type) => [$type->value => ucfirst($type->value)])
+                        ->toArray()
+                )
+                ->label('Type')
+                ->native(false)
+                ->multiple(),
 
-            Tables\Filters\Filter::make('is_urgent')
-                ->label('Urgent Products Only')
-                ->query(fn(Builder $query) => $query->where('is_urgent', true)),
+            Tables\Filters\TernaryFilter::make('is_urgent')
+                ->label('Urgent Products')
+                ->placeholder('All products')
+                ->trueLabel('Only urgent')
+                ->falseLabel('Not urgent'),
 
             Tables\Filters\Filter::make('price_range')
                 ->form([
                     Forms\Components\TextInput::make('min_price')
                         ->numeric()
-                        ->placeholder('Min Price'),
+                        ->prefix('$')
+                        ->placeholder('Min'),
                     Forms\Components\TextInput::make('max_price')
                         ->numeric()
-                        ->placeholder('Max Price'),
+                        ->prefix('$')
+                        ->placeholder('Max'),
                 ])
                 ->query(function (Builder $query, array $data) {
-                    return $query
-                        ->when(
-                            $data['min_price'],
-                            fn(Builder $query, $minPrice) => $query->where('price', '>=', $minPrice)
-                        )
-                        ->when(
-                            $data['max_price'],
-                            fn(Builder $query, $maxPrice) => $query->where('price', '<=', $maxPrice)
-                        );
+                    $query
+                        ->when($data['min_price'], fn($q, $min) => $q->where('price', '>=', $min))
+                        ->when($data['max_price'], fn($q, $max) => $q->where('price', '<=', $max));
+                })
+                ->indicateUsing(function (array $data) {
+                    $indicators = [];
+                    if ($data['min_price']) {
+                        $indicators[] = 'Min price: $'.number_format($data['min_price'], 2);
+                    }
+                    if ($data['max_price']) {
+                        $indicators[] = 'Max price: $'.number_format($data['max_price'], 2);
+                    }
+                    return $indicators;
                 }),
         ];
     }
-
 }

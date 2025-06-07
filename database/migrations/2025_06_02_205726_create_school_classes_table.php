@@ -16,7 +16,7 @@ return new class extends Migration
         Schema::create('school_classes', function (Blueprint $table) {
             $table->id();
             $table->string('name');
-            $table->enum('type', ["initial","principal","secondary"])->index();
+            $table->enum('type', ['initial','principal','secondary'])->index();
             $table->foreignId('school_id')->references('id')->on('schools');
             $table->timestamps();
         });

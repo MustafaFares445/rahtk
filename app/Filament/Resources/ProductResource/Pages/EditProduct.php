@@ -25,24 +25,6 @@ class EditProduct extends EditRecord
      */
     protected function handleRecordUpdate($record, array $data): Product
     {
-        // Process new images
-        if (isset($data['new_images']) && !empty($data['new_images'])) {
-            foreach ($data['new_images'] as $image) {
-                if ($image) {
-                    $record->addMediaFromDisk($image, 'public')
-                        ->toMediaCollection('images');
-                }
-            }
-            unset($data['new_images']); // Remove from data to avoid saving to database
-        }
-
-        // Process new video
-        if (isset($data['new_video']) && !empty($data['new_video'])) {
-            $record->addMediaFromDisk($data['new_video'], 'public')
-                ->toMediaCollection('videos');
-            unset($data['new_video']); // Remove from data to avoid saving to database
-        }
-
         // Update the main record
         $record->update($data);
 

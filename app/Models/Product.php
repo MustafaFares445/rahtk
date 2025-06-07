@@ -70,4 +70,27 @@ class Product extends Model implements HasMedia
     {
         return $this->hasOne(Building::class);
     }
+
+    public function registerMediaCollections(): void
+    {
+        $this->addMediaCollection('images')
+            ->acceptsMimeTypes(['image/jpeg', 'image/png', 'image/gif', 'image/webp']);
+
+        $this->addMediaCollection('videos')
+            ->singleFile();
+    }
+
+    // Helper method to get the first image URL
+    public function getFirstImageUrl(): ?string
+    {
+        return $this->getFirstMediaUrl('images');
+    }
+
+    // Helper method to get all image URLs
+    public function getImageUrls(): array
+    {
+        return $this->getMedia('images')->map(function ($media) {
+            return $media->getUrl();
+        })->toArray();
+    }
 }

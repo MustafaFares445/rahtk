@@ -63,7 +63,7 @@ class TeacherSeeder extends Seeder
 
             // Add a fake online image to the 'profile_images' collection
             $teacher->addMediaFromUrl('https://picsum.photos/200/300') // Example URL for a random image
-                    ->toMediaCollection('images');
+                    ->toMediaCollection('teachers-images');
         }
     }
 }

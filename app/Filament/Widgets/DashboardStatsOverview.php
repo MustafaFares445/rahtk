@@ -3,12 +3,14 @@
 namespace App\Filament\Widgets;
 
 use App\Models\Ad;
-use App\Models\Product;
 use App\Models\School;
+use App\Models\Product;
 use App\Models\Teacher;
-use Filament\Widgets\StatsOverviewWidget as BaseWidget;
-use Filament\Widgets\StatsOverviewWidget\Stat;
 use Illuminate\Support\Carbon;
+use Filament\Widgets\StatsOverviewWidget\Stat;
+use App\Filament\Widgets\ProductTypeDistributionChart;
+use Filament\Widgets\StatsOverviewWidget as BaseWidget;
+use App\Filament\Resources\NoResource\Widgets\ProductOverviewWidget;
 
 class DashboardStatsOverview extends BaseWidget
 {

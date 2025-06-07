@@ -34,6 +34,7 @@ class ProductController extends Controller
      */
     public function __invoke(Product $product)
     {
+        $product->increment('view');
         $product->load(['media' , 'farm' , 'estate' , 'car' , 'school' , 'electronic']);
 
         if($product->type == ProductTypes::SCHOOL->value){

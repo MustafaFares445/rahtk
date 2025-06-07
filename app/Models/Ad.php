@@ -30,26 +30,11 @@ class Ad extends Model implements HasMedia
             ->singleFile(); // Remove this line if you want multiple images
     }
 
-    public function registerMediaConversions(Media $media = null): void
-    {
-        $this->addMediaConversion('thumb')
-            ->width(300)
-            ->height(300)
-            ->sharpen(10);
-
-        $this->addMediaConversion('preview')
-            ->width(800)
-            ->height(600)
-            ->nonOptimized();
-    }
-
-    // Helper method to get the first image URL
     public function getFirstImageUrl(): ?string
     {
         return $this->getFirstMediaUrl('images');
     }
 
-    // Helper method to get all image URLs
     public function getImageUrls(): array
     {
         return $this->getMedia('images')->map(function ($media) {

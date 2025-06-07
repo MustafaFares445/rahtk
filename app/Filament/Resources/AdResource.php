@@ -16,6 +16,7 @@ use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\FileUpload;
 use Illuminate\Database\Eloquent\Builder;
 use App\Filament\Resources\AdResource\Pages;
+use Filament\Forms\Components\SpatieMediaLibraryFileUpload;
 
 class AdResource extends Resource
 {
@@ -52,27 +53,19 @@ class AdResource extends Resource
                                     ->displayFormat('Y-m-d')
                                     ->placeholder('Select end date')
                                     ->after('start_date'),
-                            ]),
-                    ]),
 
-                Section::make('Media')
-                    ->description('Upload images and media files for this ad')
-                    ->schema([
-                        FileUpload::make('images')
-                            ->multiple()
-                            ->image()
-                            ->imageEditor()
-                            ->imageEditorAspectRatios([
-                                '16:9',
-                                '4:3',
-                                '1:1',
-                            ])
-                            ->directory('ads')
-                            ->visibility('public')
-                            ->maxFiles(5)
-                            ->reorderable()
-                            ->columnSpanFull()
-                            ->helperText('Upload images for this ad. Supported formats: JPG, PNG, GIF'),
+                                SpatieMediaLibraryFileUpload::make('image')
+                                    ->collection('images')
+                                    ->image()
+                                    ->imageEditor()
+                                    ->imageEditorAspectRatios([
+                                        '16:9',
+                                        '4:3',
+                                        '1:1',
+                                    ])
+                                    ->columnSpanFull()
+                                    ->helperText('Upload image for this ad. Supported formats: JPG, PNG, GIF'),
+                            ]),
                     ]),
             ]);
     }
@@ -158,7 +151,6 @@ class AdResource extends Resource
                     ->query(fn (Builder $query): Builder => $query->where('end_date', '<', now())),
             ])
             ->actions([
-                Tables\Actions\ViewAction::make(),
                 Tables\Actions\EditAction::make(),
                 Tables\Actions\DeleteAction::make(),
             ])
@@ -175,19 +167,11 @@ class AdResource extends Resource
             ]));
     }
 
-    public static function getRelations(): array
-    {
-        return [
-            //
-        ];
-    }
-
     public static function getPages(): array
     {
         return [
             'index' => Pages\ListAds::route('/'),
             'create' => Pages\CreateAd::route('/create'),
-            'view' => Pages\ViewAd::route('/{record}'),
             'edit' => Pages\EditAd::route('/{record}/edit'),
         ];
     }

@@ -28,4 +28,15 @@ class Teacher extends Model implements HasMedia
     {
         return $this->belongsTo(School::class);
     }
+
+    public function registerMediaCollections(): void
+    {
+        $this->addMediaCollection('image')->singleFile();
+    }
+
+    public function getFirstImageUrl(): ?string
+    {
+        return $this->getFirstMediaUrl('images');
+    }
+
 }

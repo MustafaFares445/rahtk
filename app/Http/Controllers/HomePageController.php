@@ -2,9 +2,11 @@
 
 namespace App\Http\Controllers;
 
+use App\Enums\ProductTypes;
 use App\Http\Resources\ProductResource;
 use App\Models\Product;
 use Illuminate\Http\Request;
+use Illuminate\Validation\Rule;
 
 /**
 * @OA\Tag(
@@ -51,9 +53,20 @@ class HomePageController extends Controller
      */
     public function __invoke(Request $request)
     {
-       $products =  Product::with(['media' , 'farm' , 'estate' , 'car' , 'school' , 'electronic'])
+        $request->validate([
+            'isUrgent' => 'nullable|boolean',
+            'discount' => 'nullable|boolean',
+            'type' => ['nullable' , 'string' , Rule::in(array_column(ProductTypes::cases() , 'value'))],
+        ]);
+
+        if (!$request->has('isUrgent') && !$request->has('discount')) {
+            return response()->json(['error' => 'At least one of isUrgent or discount is required.'], 400);
+        }
+
+        $products =  Product::with(['media' , 'farm' , 'estate' , 'car' , 'school' , 'electronic'])
             ->when($request->has('isUrgent') , fn($q) => $q->where('is_urgent' , true))
             ->when($request->has('discount') , fn($q) => $q->whereNotNull('discount'))
+            ->when($request->has('type') , fn($q) => $q->where('type' , $request->get('type')))
             ->latest()
             ->take(5)
             ->get();
