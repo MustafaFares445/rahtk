@@ -29,7 +29,7 @@ class SearchController extends Controller
      *         required=true,
      *         @OA\Schema(
      *             type="string",
-    *              enum={"estate", "car", "school", "electronic", "building"}
+     *             enum={"estate", "car", "school", "electronic", "building"}
      *         )
      *     ),
      *     @OA\Response(
@@ -45,7 +45,11 @@ class SearchController extends Controller
      *     ),
      *     @OA\Response(
      *         response=400,
-     *         description="Invalid input"
+     *         description="Invalid input",
+     *         @OA\JsonContent(
+     *             type="object",
+     *             @OA\Property(property="message", type="string", example="invalid type.")
+     *         )
      *     )
      * )
      */
@@ -139,7 +143,7 @@ class SearchController extends Controller
      *     @OA\Parameter(
      *         name="filters",
      *         in="query",
-     *         description="Filters to apply to the search",
+     *         description="Filters to apply to the search. Each filter should be an array where the first element is the filter key and the second is the value.",
      *         required=false,
      *         @OA\Schema(
      *             type="array",
@@ -166,17 +170,25 @@ class SearchController extends Controller
      *     ),
      *     @OA\Response(
      *         response=400,
-     *         description="Invalid input"
+     *         description="Invalid input",
+     *         @OA\JsonContent(
+     *             type="object",
+     *             @OA\Property(property="message", type="string", example="Invalid type or filter.")
+     *         )
      *     )
      * )
      */
     public function search(Request $request)
     {
         $request->validate([
-            'type' => ['required', 'string', Rule::in(array_map(fn($case) => $case->value, ProductTypes::cases()))],
-        ]); 
+            'type' => ['nullable', 'string', Rule::in(array_map(fn($case) => $case->value, ProductTypes::cases()))],
+            'isUrgent' => 'nullable|boolean',
+            'discount' => 'nullable|boolean',
+        ]);
 
-        $productsQuery = Product::with(['media' , 'farm' , 'estate' , 'car' , 'school' , 'electronic']);
+        $productsQuery = Product::with(['media' , 'farm' , 'estate' , 'car' , 'school' , 'electronic'])
+            ->when($request->has('isUrgent') , fn($q) => $q->where('is_urgent' , true))
+            ->when($request->has('discount') , fn($q) => $q->whereNotNull('discount'));
 
         if($request->has('text')){
             $productsQuery->where(function($q) use ($request) {
@@ -194,7 +206,7 @@ class SearchController extends Controller
                 }
             });
 
-        }else{
+        }elseif($request->has('type')){
             $productsQuery->whereHas($request->get('type'));
         }
 
