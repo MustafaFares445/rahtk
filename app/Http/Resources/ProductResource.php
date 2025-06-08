@@ -140,7 +140,7 @@ class ProductResource extends JsonResource
             'electronic' => ElectronicResource::make($this->whenLoaded('electronic')),
             'farm' => FarmResource::make($this->whenLoaded('farm')),
             'primaryImage' => MediaResource::make($this->getFirstMedia('images')),
-            'media' => $this->when($this->getAllMedia ,MediaResource::collection($this->getMedia()) )
+            'media' => $this->when($this->getAllMedia ,MediaResource::collection($this->media))
         ];
     }
 }
