@@ -647,15 +647,12 @@
                             "$ref": "#/components/schemas/TeacherResource"
                         }
                     },
-                    "images": {
-                        "description": "List of images associated with the school class",
+                    "media": {
+                        "description": "List of media associated with the school class",
                         "type": "array",
                         "items": {
                             "$ref": "#/components/schemas/MediaResource"
                         }
-                    },
-                    "videos": {
-                        "$ref": "#/components/schemas/MediaResource"
                     }
                 },
                 "type": "object"

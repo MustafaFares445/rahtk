@@ -32,16 +32,10 @@ use Illuminate\Http\Resources\Json\JsonResource;
  *         @OA\Items(ref="#/components/schemas/TeacherResource")
  *     ),
  *     @OA\Property(
- *         property="images",
+ *         property="media",
  *         type="array",
- *         description="List of images associated with the school class",
+ *         description="List of media associated with the school class",
  *         @OA\Items(ref="#/components/schemas/MediaResource")
- *     ),
- *     @OA\Property(
- *         property="videos",
- *         type="object",
- *         description="The first video associated with the school class",
- *         ref="#/components/schemas/MediaResource"
  *     )
  * )
  */
@@ -60,8 +54,7 @@ class SchoolClassResource extends JsonResource
             'name' => $this->name,
             'type' => $this->type,
             'teachers' => TeacherResource::collection($this->whenLoaded('teachers')),
-            'images' => $this->whenLoaded('media' , MediaResource::collection($this->getMedia('images')) , []),
-            'videos' => $this->whenLoaded('media' , MediaResource::make($this->getFirstMedia('videos')) , null)
+            'media' => $this->relationLoaded('media') ? MediaResource::collection($this->media) : [],
         ];
     }
 }
