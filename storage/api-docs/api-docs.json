@@ -613,6 +613,13 @@
                         "items": {
                             "$ref": "#/components/schemas/MediaResource"
                         }
+                    },
+                    "media": {
+                        "description": "All media associated with the product (only included if getAllMedia is true)",
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/MediaResource"
+                        }
                     }
                 },
                 "type": "object"
