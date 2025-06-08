@@ -73,7 +73,7 @@ class HomePageController extends Controller
         $products =  Product::with(['media' , 'farm' , 'estate' , 'car' , 'school' , 'electronic'])
             ->when($request->has('isUrgent') , fn($q) => $q->where('is_urgent' , true))
             ->when($request->has('discount') , fn($q) => $q->whereNotNull('discount'))
-            ->when($request->has('type') , fn($q) => $q->where('type' , $request->get('type')))
+            ->when($request->has('type') , fn($q) =>  $q->whereHas($request->get('type')))
             ->latest()
             ->take(5)
             ->get();

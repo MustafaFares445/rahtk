@@ -98,6 +98,12 @@ use Illuminate\Http\Resources\Json\JsonResource;
  *         type="array",
  *         @OA\Items(ref="#/components/schemas/MediaResource"),
  *         description="The images associated with the product"
+ *     ),
+ *     @OA\Property(
+ *         property="media",
+ *         type="array",
+ *         @OA\Items(ref="#/components/schemas/MediaResource"),
+ *         description="All media associated with the product (only included if getAllMedia is true)"
  *     )
  * )
  */
@@ -133,9 +139,8 @@ class ProductResource extends JsonResource
             'car' => CarResource::make($this->whenLoaded('car')),
             'electronic' => ElectronicResource::make($this->whenLoaded('electronic')),
             'farm' => FarmResource::make($this->whenLoaded('farm')),
-            'video' => $this->when($this->getAllMedia , MediaResource::make($this->getFirstMedia('videos'))),
             'primaryImage' => MediaResource::make($this->getFirstMedia('images')),
-            'images' => $this->when($this->getAllMedia ,MediaResource::collection($this->getMedia('images')) )
+            'media' => $this->when($this->getAllMedia ,MediaResource::collection($this->getMedia()) )
         ];
     }
 }
