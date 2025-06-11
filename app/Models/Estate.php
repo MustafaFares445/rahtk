@@ -33,7 +33,6 @@ class Estate extends Model
         'rooms' => 'integer',
         'area' => 'decimal:2',
         'floors_number' => 'integer',
-        'floor' => 'integer',
     ];
 
     /**
