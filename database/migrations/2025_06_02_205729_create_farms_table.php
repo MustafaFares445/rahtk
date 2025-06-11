@@ -16,7 +16,7 @@ return new class extends Migration
         Schema::create('farms', function (Blueprint $table) {
             $table->id();
             $table->foreignId('product_id')->references('id')->on('products');
-            $table->enum('type', ["sell","rent"]);
+            $table->string('type')->default('sell');
             $table->unsignedSmallInteger('bedrooms');
             $table->smallInteger('bathrooms');
             $table->smallInteger('floors_number');

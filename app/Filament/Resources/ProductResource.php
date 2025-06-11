@@ -338,12 +338,6 @@ class ProductResource extends Resource
         return [
             Section::make('تفاصيل المزرعة')
                 ->schema([
-                    Forms\Components\TextInput::make('type')
-                        ->maxLength(255)
-                        ->placeholder('نوع المزرعة')
-                        ->label('نوع المزرعة')
-                        ->required(),
-
                     Forms\Components\TextInput::make('bedrooms')
                         ->numeric()
                         ->minValue(0)

@@ -17,7 +17,7 @@ class Dashboard extends BaseDashboard
 
     public function getWidgets(): array
     {
-return [
+        return [
             ProductTypeDistributionChart::class,
             MostViewedProductChart::class,
             ProductGrowthChart::class,
