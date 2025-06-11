@@ -19,7 +19,7 @@ return new class extends Migration
             $table->smallInteger('rooms');
             $table->decimal('area');
             $table->integer('floors_number');
-            $table->boolean('is_furnished');
+            $table->boolean('is_furnished')->default(false);
             $table->string('floor');
             $table->timestamps();
         });

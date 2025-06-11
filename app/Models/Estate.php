@@ -4,7 +4,6 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class Estate extends Model
 {
@@ -24,11 +23,32 @@ class Estate extends Model
         'floor',
     ];
 
+    /**
+     * The attributes that should be cast.
+     *
+     * @var array
+     */
     protected $casts = [
-        'area' => 'double'
+        'is_furnished' => 'boolean',
+        'rooms' => 'integer',
+        'area' => 'decimal:2',
+        'floors_number' => 'integer',
+        'floor' => 'integer',
     ];
 
-    public function product(): BelongsTo
+    /**
+     * The attributes that should have default values.
+     *
+     * @var array
+     */
+    protected $attributes = [
+        'is_furnished' => false,
+    ];
+
+    /**
+     * Get the product that owns the estate.
+     */
+    public function product()
     {
         return $this->belongsTo(Product::class);
     }

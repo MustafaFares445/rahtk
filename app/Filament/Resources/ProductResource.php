@@ -83,6 +83,13 @@ class ProductResource extends Resource
         $relationshipData = $data['relationship_data'] ?? [];
 
         if (isset(self::$typeFieldMappings[$type])) {
+            // Handle boolean fields properly for estate type
+            if ($type === 'estate') {
+                $relationshipData['is_furnished'] = isset($relationshipData['is_furnished'])
+                    ? (bool) $relationshipData['is_furnished']
+                    : false;
+            }
+
             $product->$type()->updateOrCreate([], $relationshipData);
         }
     }
@@ -273,7 +280,11 @@ class ProductResource extends Resource
                     Forms\Components\Toggle::make('is_furnished')
                         ->label('وضع علامة مفروشة')
                         ->default(false)
-                        ->inline(false),
+                        ->inline(false)
+                        ->afterStateHydrated(function (Forms\Components\Toggle $component, $state) {
+                            // Ensure boolean value
+                            $component->state((bool) $state);
+                        }),
 
                     Forms\Components\TextInput::make('floor')
                         ->numeric()
