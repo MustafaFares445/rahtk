@@ -26,6 +26,8 @@ class AdResource extends Resource
 
     protected static ?string $recordTitleAttribute = 'title';
 
+    protected static ?string $navigationLabel = 'إعلانات';  
+
     public static function form(Form $form): Form
     {
         return $form

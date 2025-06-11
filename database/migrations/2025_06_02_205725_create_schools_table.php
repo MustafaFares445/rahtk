@@ -18,7 +18,7 @@ return new class extends Migration
             $table->foreignId('product_id')->references('id')->on('products');
             $table->text('quate')->nullable();
             $table->string('working_duration');
-            $table->date('founding_date');
+            $table->string('founding_date');
             $table->string('address');
             $table->string('manager');
             $table->text('manager_description');

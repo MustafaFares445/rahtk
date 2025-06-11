@@ -19,7 +19,7 @@ class ProductResource extends Resource
 {
     protected static ?string $model = Product::class;
     protected static ?string $navigationIcon = 'heroicon-o-shopping-bag';
-    protected static ?string $navigationLabel = 'Products';
+    protected static ?string $navigationLabel = 'المنتجات';
     protected static ?string $modelLabel = 'Product';
     protected static ?string $recordTitleAttribute = 'title';
 
@@ -113,21 +113,24 @@ class ProductResource extends Resource
 
     private static function getProductDetailsSection(): Section
     {
-        return Section::make('Product Details')
+        return Section::make('تفاصيل المنتج')
             ->schema([
                 Forms\Components\TextInput::make('title')
+                    ->label('اسم المنتج')
                     ->required()
                     ->maxLength(255)
                     ->columnSpanFull()
-                    ->placeholder('Enter product title'),
+                    ->placeholder('أدخل عنوان المنتج'),
 
                 Forms\Components\Textarea::make('description')
+                    ->label('الوصف')
                     ->required()
                     ->columnSpanFull()
                     ->rows(3)
-                    ->placeholder('Detailed product description'),
+                    ->placeholder('وصف مفصل للمنتج'),
 
                 Forms\Components\TextInput::make('price')
+                    ->label('السعر')
                     ->required()
                     ->numeric()
                     ->prefix('$')
@@ -135,6 +138,7 @@ class ProductResource extends Resource
                     ->step(0.01),
 
                 Forms\Components\TextInput::make('discount')
+                    ->label('الخصم')
                     ->numeric()
                     ->prefix('%')
                     ->minValue(0)
@@ -142,37 +146,48 @@ class ProductResource extends Resource
                     ->step(0.1),
 
                 Forms\Components\TextInput::make('address')
+                    ->label('العنوان')
                     ->required()
                     ->maxLength(255)
                     ->columnSpanFull()
-                    ->placeholder('Product location address'),
+                    ->placeholder('عنوان موقع المنتج'),
 
                 Forms\Components\Select::make('type')
-                    ->options(
-                        collect(ProductTypes::cases())
-                            ->filter(fn($type) => $type->value !== 'school')
-                            ->mapWithKeys(fn($type) => [$type->value => ucfirst($type->value)])
-                            ->toArray()
-                    )
-                    ->required()
-                    ->enum(ProductTypes::class)
-                    ->live()
-                    ->native(false)
-                    ->afterStateUpdated(fn($state, Forms\Set $set) => $set('relationship_data', null))
-                    ->hint(self::getLoadingIndicator()),
+                ->label('النوع')
+                ->options(
+                    collect(ProductTypes::cases())
+                        ->filter(fn($type) => $type->value !== 'school')
+                        ->mapWithKeys(fn($type) => [
+                            $type->value => match ($type->value) {
+                                'estate' => 'عقار',
+                                'farm' => 'مزرعة',
+                                'car' => 'سيارة',
+                                'electronic' => 'إلكترونيات',
+                                'building' => 'مواد بناء',
+                                default => ucfirst($type->value),
+                            }
+                        ])
+                        ->toArray()
+                )
+                ->required()
+                ->enum(ProductTypes::class)
+                ->live()
+                ->native(false)
+                ->afterStateUpdated(fn($state, Forms\Set $set) => $set('relationship_data', null))
+                ->placeholder('أختر نوع المنتج')
+                ->hint(self::getLoadingIndicator()),
 
                 Forms\Components\Toggle::make('is_urgent')
-                    ->label('Mark as Urgent')
+                    ->label('وضع علامة مستعجل')
                     ->default(false)
-                    ->inline(false)
-                    ->helperText('Highlight this product as urgent'),
+                    ->inline(false),
             ])
             ->columns(2);
     }
 
     private static function getMediaSection(): Section
     {
-        return Section::make('Media & Attachments')
+        return Section::make('الوسائط والمرفقات')
             ->schema([
                 Forms\Components\SpatieMediaLibraryFileUpload::make('images')
                     ->collection('images')
@@ -180,27 +195,28 @@ class ProductResource extends Resource
                     ->multiple()
                     ->preserveFilenames()
                     ->required()
-                    ->label('Product Images')
+                    ->label('صور المنتج')
                     ->acceptedFileTypes(['image/jpeg', 'image/png', 'image/gif', 'image/webp'])
-                    ->helperText('Upload product images (JPEG, PNG, GIF, WebP)')
+                    ->helperText('رفع صور المنتج (JPEG, PNG, GIF, WebP)')
                     ->reorderable()
                     ->imagePreviewHeight('150')
                     ->columnSpanFull()
                     ->downloadable()
                     ->openable(),
 
-                Forms\Components\SpatieMediaLibraryFileUpload::make('video')
+                Forms\Components\SpatieMediaLibraryFileUpload::make('videos')
                     ->collection('videos')
+                    ->multiple()
                     ->acceptedFileTypes(['video/mp4', 'video/quicktime', 'video/x-msvideo', 'video/x-ms-wmv'])
                     ->preserveFilenames()
-                    ->label('Product Video')
-                    ->helperText('Optional product video (MP4, MOV, AVI, WMV)')
+                    ->label('فيديوهات المنتج')
+                    ->helperText('فيديوهات المنتج (اختياري) (MP4, MOV, AVI, WMV)')
                     ->columnSpanFull()
                     ->downloadable(),
             ]);
     }
 
-    /* ==================== TYPE-SPECIFIC FIELDS ==================== */
+    /* ==================== حقول خاصة بالنوع ==================== */
 
     private static function getTypeSpecificFields(): Forms\Components\Group
     {
@@ -231,35 +247,40 @@ class ProductResource extends Resource
     private static function getEstateFields(): array
     {
         return [
-            Section::make('Real Estate Details')
+            Section::make('تفاصيل العقار')
                 ->schema([
                     Forms\Components\TextInput::make('rooms')
                         ->numeric()
                         ->minValue(1)
                         ->step(1)
-                        ->label('Rooms'),
+                        ->label('الغرف')
+                        ->required(),
 
                     Forms\Components\TextInput::make('area')
                         ->numeric()
                         ->minValue(1)
-                        ->suffix('sq ft')
-                        ->label('Area'),
+                        ->suffix('قدم مربع')
+                        ->label('المساحة')
+                        ->required(),
 
                     Forms\Components\TextInput::make('floors_number')
                         ->numeric()
                         ->minValue(1)
                         ->step(1)
-                        ->label('Floors'),
+                        ->label('الطوابق')
+                        ->required(),
 
                     Forms\Components\Toggle::make('is_furnished')
-                        ->inline(false)
-                        ->label('Furnished'),
+                        ->label('وضع علامة مفروشة')
+                        ->default(false)
+                        ->inline(false),
 
                     Forms\Components\TextInput::make('floor')
                         ->numeric()
                         ->minValue(0)
                         ->step(1)
-                        ->label('Floor Number'),
+                        ->label('رقم الطابق')
+                        ->required(),
                 ])
                 ->columns(2)
         ];
@@ -268,20 +289,22 @@ class ProductResource extends Resource
     private static function getCarFields(): array
     {
         return [
-            Section::make('Vehicle Details')
+            Section::make('تفاصيل المركبة')
                 ->schema([
                     Forms\Components\TextInput::make('model')
                         ->maxLength(255)
-                        ->placeholder('Model name')
-                        ->label('Model'),
+                        ->placeholder('اسم الموديل')
+                        ->label('الموديل')
+                        ->required(),
 
                     self::getYearField(),
 
                     Forms\Components\TextInput::make('kilo')
                         ->numeric()
                         ->minValue(0)
-                        ->suffix('km')
-                        ->label('Kilometers'),
+                        ->suffix('كم')
+                        ->label('الكيلومترات')
+                        ->required(),
                 ])
                 ->columns(2)
         ];
@@ -290,17 +313,19 @@ class ProductResource extends Resource
     private static function getElectronicFields(): array
     {
         return [
-            Section::make('Electronic Specifications')
+            Section::make('مواصفات الإلكترونيات')
                 ->schema([
                     Forms\Components\TextInput::make('model')
                         ->maxLength(255)
-                        ->placeholder('Model number')
-                        ->label('Model'),
+                        ->placeholder('رقم الموديل')
+                        ->label('الموديل')
+                        ->required(),
 
                     Forms\Components\TextInput::make('brand')
                         ->maxLength(255)
-                        ->placeholder('Brand name')
-                        ->label('Brand'),
+                        ->placeholder('اسم الماركة')
+                        ->label('الماركة')
+                        ->required(),
 
                     self::getYearField(),
                 ])
@@ -311,36 +336,41 @@ class ProductResource extends Resource
     private static function getFarmFields(): array
     {
         return [
-            Section::make('Farm Property Details')
+            Section::make('تفاصيل المزرعة')
                 ->schema([
                     Forms\Components\TextInput::make('type')
                         ->maxLength(255)
-                        ->placeholder('Farm type')
-                        ->label('Farm Type'),
+                        ->placeholder('نوع المزرعة')
+                        ->label('نوع المزرعة')
+                        ->required(),
 
                     Forms\Components\TextInput::make('bedrooms')
                         ->numeric()
                         ->minValue(0)
                         ->step(1)
-                        ->label('Bedrooms'),
+                        ->label('غرف النوم')
+                        ->required(),
 
                     Forms\Components\TextInput::make('bathrooms')
                         ->numeric()
                         ->minValue(0)
                         ->step(1)
-                        ->label('Bathrooms'),
+                        ->label('الحمامات')
+                        ->required(),
 
                     Forms\Components\TextInput::make('floors_number')
                         ->numeric()
                         ->minValue(1)
                         ->step(1)
-                        ->label('Floors'),
+                        ->label('الطوابق')
+                        ->required(),
 
                     Forms\Components\TextInput::make('size')
                         ->numeric()
                         ->minValue(1)
-                        ->suffix('acres')
-                        ->label('Size'),
+                        ->suffix('فدان')
+                        ->label('المساحة')
+                        ->required(),
                 ])
                 ->columns(2)
         ];
@@ -349,40 +379,52 @@ class ProductResource extends Resource
     private static function getBuildingFields(): array
     {
         return [
-            Section::make('Building Specifications')
+            Section::make('مواصفات المبنى')
                 ->schema([
                     Forms\Components\TextInput::make('type')
                         ->maxLength(255)
-                        ->placeholder('Building type')
-                        ->label('Building Type'),
+                        ->placeholder('نوع المبنى')
+                        ->label('نوع المبنى')
+                        ->required(),
 
                     Forms\Components\TextInput::make('brand')
                         ->maxLength(255)
-                        ->placeholder('Construction brand')
-                        ->label('Brand'),
+                        ->placeholder('ماركة البناء')
+                        ->label('الماركة')
+                        ->required(),
 
                     Forms\Components\TextInput::make('options')
                         ->maxLength(255)
-                        ->placeholder('Special features')
-                        ->label('Features'),
+                        ->placeholder('ميزات خاصة')
+                        ->label('الميزات')
+                        ->required(),
                 ])
                 ->columns(2)
         ];
     }
 
-    /* ==================== REUSABLE COMPONENTS ==================== */
+    /* ==================== مكونات قابلة لإعادة الاستخدام ==================== */
 
-    private static function getYearField(): Forms\Components\DatePicker
+    private static function getYearField(): Forms\Components\Select
     {
-        return Forms\Components\DatePicker::make('year')
+        return Forms\Components\Select::make('year')
             ->required()
-            ->format('Y')
-            ->displayFormat('Y')
-            ->native(false)
-            ->minDate(now()->subYears(100))
-            ->maxDate(now())
-            ->columnSpan(1)
-            ->label('Year');
+            ->label('السنة')
+            ->options(function () {
+                $currentYear = now()->year;
+                $startYear = 1990;
+                $years = [];
+
+                for ($year = $currentYear; $year >= $startYear; $year--) {
+                    $years[$year] = $year;
+                }
+
+                return $years;
+            })
+            ->searchable()
+            ->placeholder('اختر السنة')
+            ->extraInputAttributes(['dir' => 'rtl']);
+
     }
 
     private static function getLoadingIndicator(): HtmlString
@@ -399,12 +441,12 @@ class ProductResource extends Resource
             ->content(new HtmlString(
                 '<div wire:loading wire:target="data.type" class="flex items-center space-x-2 text-sm text-gray-600 p-2">
                     <x-filament::loading-indicator class="h-4 w-4" />
-                    <span>Loading product specifications...</span>
+                    <span>جاري تحميل مواصفات المنتج...</span>
                  </div>'
             ));
     }
 
-    /* ==================== TABLE CONFIGURATION ==================== */
+    /* ==================== تكوين الجدول ==================== */
 
     private static function getTableColumns(): array
     {
@@ -416,6 +458,7 @@ class ProductResource extends Resource
                 ->getStateUsing(fn($record) => $record->getFirstMediaUrl('images')),
 
             Tables\Columns\TextColumn::make('title')
+                ->label('العنوان')
                 ->searchable()
                 ->sortable()
                 ->weight('medium')
@@ -423,32 +466,36 @@ class ProductResource extends Resource
                 ->wrap(),
 
             Tables\Columns\TextColumn::make('type')
+                ->label('النوع')
                 ->badge()
                 ->color(fn(string $state): string => self::$typeBadgeColors[$state] ?? 'secondary')
                 ->formatStateUsing(fn($state) => ucfirst($state))
                 ->sortable(),
 
             Tables\Columns\TextColumn::make('price')
+                ->label('السعر')
                 ->money('USD')
                 ->sortable()
                 ->color(fn($record) => $record->discount ? 'success' : null)
-                ->description(fn($record) => $record->discount ? 'Discounted from $'.number_format($record->price / (1 - $record->discount / 100), 2) : null),
+                ->description(fn($record) => $record->discount ? 'السعر قبل الخصم: $'.number_format($record->price / (1 - $record->discount / 100), 2) : null),
 
             Tables\Columns\IconColumn::make('is_urgent')
-                ->label('Urgent')
+                ->label('مستعجل')
+                ->default(false)
                 ->boolean()
                 ->trueIcon('heroicon-o-bolt')
                 ->trueColor('warning')
                 ->sortable(),
 
             Tables\Columns\TextColumn::make('created_at')
-                ->label('Posted')
+                ->label('تاريخ النشر')
                 ->sortable()
                 ->icon('heroicon-o-calendar')
                 ->color('success')
                 ->dateTime('M d, Y'),
 
             Tables\Columns\TextColumn::make('view')
+                ->label('المشاهدات')
                 ->numeric()
                 ->sortable()
                 ->toggleable(isToggledHiddenByDefault: true),
@@ -464,26 +511,26 @@ class ProductResource extends Resource
                         ->mapWithKeys(fn($type) => [$type->value => ucfirst($type->value)])
                         ->toArray()
                 )
-                ->label('Type')
+                ->label('النوع')
                 ->native(false)
                 ->multiple(),
 
             Tables\Filters\TernaryFilter::make('is_urgent')
-                ->label('Urgent Products')
-                ->placeholder('All products')
-                ->trueLabel('Only urgent')
-                ->falseLabel('Not urgent'),
+                ->label('المنتجات المستعجلة')
+                ->placeholder('جميع المنتجات')
+                ->trueLabel('المنتجات المستعجلة فقط')
+                ->falseLabel('غير مستعجل'),
 
             Tables\Filters\Filter::make('price_range')
                 ->form([
                     Forms\Components\TextInput::make('min_price')
                         ->numeric()
                         ->prefix('$')
-                        ->placeholder('Min'),
+                        ->placeholder('الحد الأدنى'),
                     Forms\Components\TextInput::make('max_price')
                         ->numeric()
                         ->prefix('$')
-                        ->placeholder('Max'),
+                        ->placeholder('الحد الأقصى'),
                 ])
                 ->query(function (Builder $query, array $data) {
                     $query
@@ -493,10 +540,10 @@ class ProductResource extends Resource
                 ->indicateUsing(function (array $data) {
                     $indicators = [];
                     if ($data['min_price']) {
-                        $indicators[] = 'Min price: $'.number_format($data['min_price'], 2);
+                        $indicators[] = 'الحد الأدنى للسعر: $'.number_format($data['min_price'], 2);
                     }
                     if ($data['max_price']) {
-                        $indicators[] = 'Max price: $'.number_format($data['max_price'], 2);
+                        $indicators[] = 'الحد الأقصى للسعر: $'.number_format($data['max_price'], 2);
                     }
                     return $indicators;
                 }),
