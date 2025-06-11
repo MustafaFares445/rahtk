@@ -18,7 +18,7 @@ return new class extends Migration
             $table->foreignId('product_id')->references('id')->on('products');
             $table->string('model');
             $table->date('year');
-            $table->integer('kilo');
+            $table->string('type')->default('sell');
             $table->timestamps();
         });
 

@@ -19,7 +19,7 @@ class Car extends Model
         'product_id',
         'model',
         'year',
-        'kilo',
+        'type',
     ];
 
     public function product(): BelongsTo

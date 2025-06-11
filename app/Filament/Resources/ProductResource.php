@@ -83,12 +83,12 @@ class ProductResource extends Resource
         $relationshipData = $data['relationship_data'] ?? [];
 
         if (isset(self::$typeFieldMappings[$type])) {
-            // Handle boolean fields properly for estate type
-            if ($type === 'estate') {
-                $relationshipData['is_furnished'] = isset($relationshipData['is_furnished'])
-                    ? (bool) $relationshipData['is_furnished']
-                    : false;
-            }
+            // // Handle boolean fields properly for estate type
+            // if ($type === 'estate') {
+            //     $relationshipData['is_furnished'] = isset($relationshipData['is_furnished'])
+            //         ? (bool) $relationshipData['is_furnished']
+            //         : false;
+            // }
 
             $product->$type()->updateOrCreate([], $relationshipData);
         }
@@ -277,14 +277,14 @@ class ProductResource extends Resource
                         ->label('الطوابق')
                         ->required(),
 
-                    Forms\Components\Toggle::make('is_furnished')
-                        ->label('وضع علامة مفروشة')
-                        ->default(false)
-                        ->inline(false)
-                        ->afterStateHydrated(function (Forms\Components\Toggle $component, $state) {
-                            // Ensure boolean value
-                            $component->state((bool) $state);
-                        }),
+                    // Forms\Components\Toggle::make('is_furnished')
+                    //     ->label('وضع علامة مفروشة')
+                    //     ->default(false)
+                    //     ->inline(false)
+                    //     ->afterStateHydrated(function (Forms\Components\Toggle $component, $state) {
+                    //         // Ensure boolean value
+                    //         $component->state((bool) $state);
+                    //     }),
 
                     Forms\Components\TextInput::make('floor')
                         ->numeric()
@@ -309,13 +309,6 @@ class ProductResource extends Resource
                         ->required(),
 
                     self::getYearField(),
-
-                    Forms\Components\TextInput::make('kilo')
-                        ->numeric()
-                        ->minValue(0)
-                        ->suffix('كم')
-                        ->label('الكيلومترات')
-                        ->required(),
                 ])
                 ->columns(2)
         ];
@@ -388,13 +381,13 @@ class ProductResource extends Resource
                 ->schema([
                     Forms\Components\TextInput::make('type')
                         ->maxLength(255)
-                        ->placeholder('نوع المبنى')
-                        ->label('نوع المبنى')
+                        ->placeholder('نوع مادة البناء')
+                        ->label('نوع  مادة البناء')
                         ->required(),
 
                     Forms\Components\TextInput::make('brand')
                         ->maxLength(255)
-                        ->placeholder('ماركة البناء')
+                        ->placeholder('ماركة مادة البناء')
                         ->label('الماركة')
                         ->required(),
 

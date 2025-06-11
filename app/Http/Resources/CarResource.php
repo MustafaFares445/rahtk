@@ -26,9 +26,9 @@ use Illuminate\Http\Resources\Json\JsonResource;
  *         description="The manufacturing year of the car"
  *     ),
  *     @OA\Property(
- *         property="kilo",
- *         type="integer",
- *         description="The mileage of the car in kilometers"
+ *         property="type",
+ *         type="strign",
+ *         description="The type of the car (sell)"
  *     )
  * )
  */
@@ -46,7 +46,7 @@ class CarResource extends JsonResource
             'id' => $this->id,
             'model' => $this->model,
             'year' => $this->year,
-            'kilo' => $this->kilo,
+            'type' => $this->type,
         ];
     }
 }

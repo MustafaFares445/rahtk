@@ -358,9 +358,9 @@
                         "description": "The manufacturing year of the car",
                         "type": "integer"
                     },
-                    "kilo": {
-                        "description": "The mileage of the car in kilometers",
-                        "type": "integer"
+                    "type": {
+                        "description": "The type of the car (sell)",
+                        "type": "strign"
                     }
                 },
                 "type": "object"
