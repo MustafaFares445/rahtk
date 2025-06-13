@@ -23,6 +23,16 @@ class SchoolClass extends Model implements HasMedia
         'school_id',
     ];
 
+    protected static function boot()
+    {
+        parent::boot();
+
+        // When a school class is deleted, detach all teachers
+        static::deleting(function ($schoolClass) {
+            $schoolClass->teachers()->detach();
+        });
+    }
+
 
     public function school(): BelongsTo
     {

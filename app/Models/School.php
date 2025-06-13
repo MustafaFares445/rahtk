@@ -26,6 +26,23 @@ class School extends Model implements HasMedia
         'manager_description',
     ];
 
+    protected static function boot()
+    {
+        parent::boot();
+
+        static::deleting(function ($school) {
+            // Delete related school classes
+            $school->schoolClasses()->each(function ($schoolClass) {
+                $schoolClass->delete();
+            });
+
+            // Delete related teachers
+            $school->teachers()->each(function ($teacher) {
+                $teacher->delete();
+            });
+        });
+    }
+
     public function product(): BelongsTo
     {
         return $this->belongsTo(Product::class);
