@@ -3,16 +3,17 @@
 namespace App\Models;
 
 use Spatie\Sluggable\HasSlug;
+use PhpParser\Node\Expr\FuncCall;
 use Spatie\MediaLibrary\HasMedia;
 use Spatie\Sluggable\SlugOptions;
 use Illuminate\Database\Eloquent\Model;
+use Cviebrock\EloquentSluggable\Sluggable;
 use Spatie\MediaLibrary\InteractsWithMedia;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
-use PhpParser\Node\Expr\FuncCall;
 
 class Product extends Model implements HasMedia
 {
-    use HasFactory , HasSlug , InteractsWithMedia;
+    use HasFactory , Sluggable , InteractsWithMedia;
 
     /**
      * The attributes that are mass assignable.
@@ -32,13 +33,17 @@ class Product extends Model implements HasMedia
     ];
 
     /**
-     * Get the options for generating the slug.
+     * Return the sluggable configuration array for this model.
+     *
+     * @return array
      */
-    public function getSlugOptions() : SlugOptions
+    public function sluggable(): array
     {
-        return SlugOptions::create()
-            ->generateSlugsFrom('name')
-            ->saveSlugsTo('slug');
+        return [
+            'slug' => [
+                'source' => 'title'
+            ]
+        ];
     }
 
     public function estate()
