@@ -118,7 +118,7 @@ class SchoolResource extends Resource
                     ->preserveFilenames()
                     ->required()
                     ->label('صور المدرسة')
-                    ->acceptedFileTypes(['image/jpeg', 'image/png', 'image/gif', 'image/webp'])
+                    ->acceptedFileTypes(['image/jpeg', 'image/png', 'image/gif', 'image/webp' , 'image/jpg'])
                     ->helperText('قم بتحميل صورة واحدة أو أكثر للمدرسة (JPEG, PNG, GIF, WebP).')
                     ->reorderable()
                     ->imagePreviewHeight('100')
@@ -215,7 +215,7 @@ class SchoolResource extends Resource
                     ->panelLayout('grid')
                     ->downloadable()
                     ->openable()
-                    ->acceptedFileTypes(['image/jpeg', 'image/png', 'image/webp'])
+                    ->acceptedFileTypes(['image/jpeg', 'image/png', 'image/webp' , 'image/jpg'])
                     ->helperText('قم بتحميل صورة شخصية احترافية (نسبة 3:4 موصى بها)')
                     ->hint('الحد الأقصى 5MB لكل صورة • JPEG أو PNG أو WebP')
                     ->extraInputAttributes(['dir' => 'rtl']),
@@ -253,7 +253,7 @@ class SchoolResource extends Resource
                     ->imageResizeMode('cover')
                     ->imageCropAspectRatio('1:1')
                     ->imageEditor()
-                    ->acceptedFileTypes(['image/jpeg', 'image/png', 'image/gif', 'image/webp'])
+                    ->acceptedFileTypes(['image/jpeg', 'image/png', 'image/gif', 'image/webp' , 'image/jpg'])
                     ->helperText('صورة عالية الجودة (نسبة 1:1 موصى بها)')
                     ->downloadable()
                     ->openable()
@@ -303,7 +303,7 @@ class SchoolResource extends Resource
                             ->imageResizeMode('cover')
                             ->imageCropAspectRatio('1:1')
                             ->imageEditor()
-                            ->acceptedFileTypes(['image/jpeg', 'image/png', 'image/gif', 'image/webp'])
+                            ->acceptedFileTypes(['image/jpeg', 'image/png', 'image/gif', 'image/webp' , 'image/jpg'])
                             ->helperText('صورة شخصية عالية الجودة (نسبة 1:1 موصى بها)')
                             ->downloadable()
                             ->openable()
@@ -540,12 +540,6 @@ class SchoolResource extends Resource
                 ->sortable()
                 ->icon('heroicon-o-calendar')
                 ->color('success'),
-
-            Tables\Columns\TextColumn::make('address')
-                ->label('العنوان')
-                ->searchable()
-                ->icon('heroicon-o-map-pin')
-                ->tooltip('عنوان المدرسة'),
 
             Tables\Columns\TextColumn::make('manager')
                 ->label('المدير')

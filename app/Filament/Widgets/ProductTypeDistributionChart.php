@@ -28,7 +28,7 @@ class ProductTypeDistributionChart extends ChartWidget
     {
         return [
             'plugins' => [
-                'legend' => [
+            'legend' => [
                     'display' => true,
                     'position' => 'bottom',
                 ],

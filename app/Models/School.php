@@ -22,7 +22,6 @@ class School extends Model implements HasMedia
         'quate',
         'working_duration',
         'founding_date',
-        'address',
         'manager',
         'manager_description',
     ];

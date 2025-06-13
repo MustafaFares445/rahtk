@@ -19,7 +19,6 @@ return new class extends Migration
             $table->text('quate')->nullable();
             $table->string('working_duration');
             $table->string('founding_date');
-            $table->string('address');
             $table->string('manager');
             $table->text('manager_description');
             $table->timestamps();
