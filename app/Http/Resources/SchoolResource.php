@@ -85,7 +85,7 @@ class SchoolResource extends JsonResource
             'managerDescription' => $this->manager_description,
             'schoolClasses' => SchoolClassResource::collection($this->whenLoaded('schoolClasses')),
             'managerImage' => MediaResource::make($this->getFirstMedia('managers-images')),
-
+            'media' => $this->when($this->getAllMedia ,MediaResource::collection($this->media->where('collection_name' , 'images')->orWhere('collection_name' , 'videos'))),
             'servicesImages' => MediaResource::collection($this->whenLoaded('media' , $this->getMedia('services-images'))),
         ];
     }
