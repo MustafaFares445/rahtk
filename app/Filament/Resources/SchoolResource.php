@@ -375,14 +375,6 @@ class SchoolResource extends Resource
                         ->required()
                         ->columnSpan(1)
                         ->label('المستوى التعليمي')
-                        ->formatStateUsing(function ($state) {
-                            return match($state) {
-                                'initial' => 'التعليم الأولي',
-                                'principal' => 'التعليم الابتدائي',
-                                'secondary' => 'التعليم الإعدادي والثانوي',
-                                default => ''
-                            };
-                        })
                         ->dehydrated(true),
 
                     Forms\Components\Select::make('teachers')
