@@ -467,7 +467,14 @@ class ProductResource extends Resource
                 ->label('النوع')
                 ->badge()
                 ->color(fn(string $state): string => self::$typeBadgeColors[$state] ?? 'secondary')
-                ->formatStateUsing(fn($state) => ucfirst($state))
+                ->formatStateUsing(fn($state) => match ($state) {
+                    'estate' => 'عقار',
+                    'farm' => 'مزرعة',
+                    'car' => 'سيارة',
+                    'electronic' => 'إلكترونيات',
+                    'building' => 'مواد بناء',
+                    default => ucfirst($state),
+                })
                 ->sortable(),
 
             Tables\Columns\TextColumn::make('price')
@@ -506,7 +513,16 @@ class ProductResource extends Resource
             Tables\Filters\SelectFilter::make('type')
                 ->options(
                     collect(ProductTypes::cases())
-                        ->mapWithKeys(fn($type) => [$type->value => ucfirst($type->value)])
+                        ->mapWithKeys(fn($type) => [
+                            $type->value => match ($type->value) {
+                                'estate' => 'عقار',
+                                'farm' => 'مزرعة',
+                                'car' => 'سيارة',
+                                'electronic' => 'إلكترونيات',
+                                'building' => 'مواد بناء',
+                                default => ucfirst($type->value),
+                            }
+                        ])
                         ->toArray()
                 )
                 ->label('النوع')

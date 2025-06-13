@@ -20,23 +20,23 @@ class AdStatsOverview extends BaseWidget
         $expiredAds = Ad::where('end_date', '<', $now)->count();
 
         return [
-            Stat::make('Total Ads', $totalAds)
-                ->description('All advertisements')
+            Stat::make('إجمالي الإعلانات', $totalAds)
+                ->description('جميع الإعلانات')
                 ->descriptionIcon('heroicon-m-megaphone')
                 ->color('primary'),
 
-            Stat::make('Active Ads', $activeAds)
-                ->description('Currently running')
+            Stat::make('الإعلانات النشطة', $activeAds)
+                ->description('تعمل حاليًا')
                 ->descriptionIcon('heroicon-m-play')
                 ->color('success'),
 
-            Stat::make('Scheduled Ads', $scheduledAds)
-                ->description('Waiting to start')
+            Stat::make('الإعلانات المجدولة', $scheduledAds)
+                ->description('في انتظار البدء')
                 ->descriptionIcon('heroicon-m-clock')
                 ->color('info'),
 
-            Stat::make('Expired Ads', $expiredAds)
-                ->description('Finished campaigns')
+            Stat::make('الإعلانات المنتهية', $expiredAds)
+                ->description('الحملات المنتهية')
                 ->descriptionIcon('heroicon-m-stop')
                 ->color('danger'),
         ];

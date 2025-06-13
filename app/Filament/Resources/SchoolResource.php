@@ -278,7 +278,12 @@ class SchoolResource extends Resource
                             ->columnSpan(1)
                             ->label('الاسم الكامل')
                             ->placeholder('د. سارة جونسون')
-                            ->extraInputAttributes(['dir' => 'rtl']),
+                            ->extraInputAttributes(['dir' => 'rtl'])
+                            ->live(onBlur: true) // Add live update
+                            ->afterStateUpdated(function ($state, Forms\Set $set, Forms\Get $get) {
+                                // Trigger update of teacher options in class management
+                                $set('../../teacher_list_updated', time());
+                            }),
 
                         Forms\Components\TextInput::make('job_title')
                             ->required()
@@ -322,7 +327,8 @@ class SchoolResource extends Resource
                     ->itemLabel(fn (array $state): ?string => $state['name'] ?? 'مدرس جديد')
                     ->grid(2)
                     ->collapsed()
-                    ->helperText('أضف جميع المدرسين ببياناتهم وصورهم'),
+                    ->helperText('أضف جميع المدرسين ببياناتهم وصورهم')
+                    ->live(), // Make the entire repeater live
             ]);
     }
 
@@ -333,117 +339,176 @@ class SchoolResource extends Resource
             ->icon('heroicon-o-book-open')
             ->collapsible()
             ->schema([
-                Forms\Components\Repeater::make('school_classes')
-                    ->relationship('schoolClasses')
-                    ->label('قائمة الفصول')
-                    ->schema([
-                        Forms\Components\TextInput::make('name')
-                            ->required()
-                            ->maxLength(255)
-                            ->columnSpan(1)
-                            ->label('اسم الفصل')
-                            ->extraInputAttributes(['dir' => 'rtl']),
+                // Hidden field to track teacher list updates
+                Forms\Components\Hidden::make('teacher_list_updated')
+                    ->default(0),
 
-                        Forms\Components\Select::make('type')
-                            ->required()
-                            ->options([
+                Forms\Components\Repeater::make('school_classes')
+                ->relationship('schoolClasses')
+                ->label('قائمة الفصول')
+                ->schema([
+
+                    Forms\Components\Select::make('name')
+                        ->required()
+                        ->options([
+                            'kga' => 'KGA',
+                            'kgb' => 'KGB',
+                            '1st' => 'الصف الأول',
+                            '2nd' => 'الصف الثاني',
+                            '3rd' => 'الصف الثالث',
+                            '4th' => 'الصف الرابع',
+                            '5th' => 'الصف الخامس',
+                            '6th' => 'الصف السادس',
+                            '7th' => 'الصف السابع',
+                            '8th' => 'الصف الثامن',
+                            '9th' => 'الصف التاسع',
+                            '10th' => 'الصف العاشر',
+                            '11th' => 'الصف الحادي عشر',
+                            'high_school' => 'بكالوريا',
+                        ])
+                        ->columnSpan(1)
+                        ->label('اسم الفصل')
+                        ->native(false)
+                        ->extraInputAttributes(['dir' => 'rtl'])
+                        ->afterStateUpdated(function ($state, Forms\Set $set) {
+                            if ($state === 'kga' || $state === 'kgb') {
+                                $set('type', 'initial');
+                            } elseif (in_array($state, ['1st', '2nd', '3rd', '4th', '5th', '6th'])) {
+                                $set('type', 'principal');
+                            } elseif (in_array($state, ['7th', '8th', '9th', '10th', '11th', 'high_school'])) {
+                                $set('type', 'secondary');
+                            }
+                        })
+                        ->live(),
+
+                    Forms\Components\Hidden::make('type')
+                        ->required()
+                        ->columnSpan(1)
+                        ->label('المستوى التعليمي')
+                        ->formatStateUsing(function ($state) {
+                            return match($state) {
                                 'initial' => 'التعليم الأولي',
                                 'principal' => 'التعليم الابتدائي',
-                                'secondary' => 'التعليم الثانوي'
-                            ])
-                            ->columnSpan(1)
-                            ->label('المستوى التعليمي')
-                            ->native(false)
-                            ->extraInputAttributes(['dir' => 'rtl']),
+                                'secondary' => 'التعليم الإعدادي والثانوي',
+                                default => ''
+                            };
+                        })
+                        ->dehydrated(true),
 
-                        Forms\Components\Select::make('teachers')
-                            ->relationship('teachers', 'name')
-                            ->multiple()
-                            ->preload()
-                            ->searchable()
-                            ->columnSpanFull()
-                            ->label('المدرسون المعينون')
-                            ->createOptionAction(
-                                fn ($action) => $action->modalHeading('إضافة مدرس جديد')
-                            )
-                            ->createOptionForm([
-                                Forms\Components\Section::make('معلومات المدرس')
-                                    ->columns(2)
-                                    ->schema([
-                                        Forms\Components\TextInput::make('name')
-                                            ->required()
-                                            ->maxLength(255)
-                                            ->label('الاسم الكامل')
-                                            ->extraInputAttributes(['dir' => 'rtl']),
+                    Forms\Components\Select::make('teachers')
+                        ->label('المدرسون المعينون')
+                        ->multiple()
+                        ->searchable()
+                        ->columnSpanFull()
+                        ->options(function (Forms\Get $get, $record) {
+                            // Get teachers from the current form state (for new schools)
+                            $formTeachers = $get('../../school_teachers') ?? [];
+                            $options = [];
 
-                                        Forms\Components\TextInput::make('job_title')
-                                            ->required()
-                                            ->maxLength(255)
-                                            ->label('المسمى الوظيفي')
-                                            ->extraInputAttributes(['dir' => 'rtl']),
+                            // Add teachers from form state
+                            foreach ($formTeachers as $index => $teacher) {
+                                if (!empty($teacher['name'])) {
+                                    $options["temp_$index"] = $teacher['name'] . ' - ' . ($teacher['job_title'] ?? '');
+                                }
+                            }
 
-                                        Forms\Components\SpatieMediaLibraryFileUpload::make('image')
-                                            ->collection('teachers-images')
-                                            ->image()
-                                            ->preserveFilenames()
-                                            ->required()
-                                            ->columnSpanFull()
-                                            ->label('صورة شخصية')
-                                            ->imageEditor()
-                                            ->imageCropAspectRatio('1:1')
-                                            ->extraInputAttributes(['dir' => 'rtl']),
+                            // If editing existing school, also include saved teachers
+                            if ($record && $record->school_id) {
+                                $savedTeachers = \App\Models\Teacher::where('school_id', $record->school_id)->get();
+                                foreach ($savedTeachers as $teacher) {
+                                    $options[$teacher->id] = $teacher->name . ' - ' . $teacher->job_title;
+                                }
+                            }
 
-                                        Forms\Components\Hidden::make('school_id')
-                                            ->default(function ($operation, $state, Forms\Set $set) {
-                                                if ($operation === 'create') {
-                                                    return null;
-                                                }
-                                                return $state ?? null;
-                                            })
-                                            ->dehydrated(),
-                                    ]),
-                            ])
-                            ->hint('اختر أو أضف مدرسين لهذا الفصل'),
+                            return $options;
+                        })
+                        ->getOptionLabelFromRecordUsing(fn ($record) => $record->name . ' - ' . $record->job_title)
+                        ->createOptionAction(
+                            fn ($action) => $action->modalHeading('إضافة مدرس جديد')
+                        )
+                        ->createOptionForm([
+                            Forms\Components\Section::make('معلومات المدرس')
+                                ->columns(2)
+                                ->schema([
+                                    Forms\Components\TextInput::make('name')
+                                        ->required()
+                                        ->maxLength(255)
+                                        ->label('الاسم الكامل')
+                                        ->extraInputAttributes(['dir' => 'rtl']),
 
-                        Forms\Components\SpatieMediaLibraryFileUpload::make('videos')
-                            ->collection('videos')
-                            ->multiple()
-                            ->acceptedFileTypes(['video/mp4', 'video/quicktime', 'video/x-msvideo', 'video/x-ms-wmv'])
-                            ->preserveFilenames()
-                            ->columnSpanFull()
-                            ->label('فيديوهات الفصل')
-                            ->downloadable()
-                            ->openable()
-                            ->helperText('قم بتحميل فيديو تعريفي أو توضيحي للفصل (الحد الأقصى 50MB)')
-                            ->hint('صيغة MP4, MOV, AVI, أو WMV')
-                            ->extraInputAttributes(['dir' => 'rtl']),
+                                    Forms\Components\TextInput::make('job_title')
+                                        ->required()
+                                        ->maxLength(255)
+                                        ->label('المسمى الوظيفي')
+                                        ->extraInputAttributes(['dir' => 'rtl']),
 
-                        Forms\Components\SpatieMediaLibraryFileUpload::make('images')
-                            ->collection('images')
-                            ->image()
-                            ->multiple()
-                            ->preserveFilenames()
-                            ->required()
-                            ->columnSpanFull()
-                            ->label('معرض الصور')
-                            ->reorderable()
-                            ->appendFiles()
-                            ->imageResizeMode('cover')
-                            ->imageEditor()
-                            ->helperText('قم بتحميل صور للفصل أو أعمال الطلاب أو الأنشطة')
-                            ->hint('صيغة JPEG, PNG, GIF, أو WebP')
-                            ->directory('class-gallery')
-                            ->extraInputAttributes(['dir' => 'rtl']),
-                    ])
-                    ->columns(2)
-                    ->addActionLabel('+ إضافة فصل جديد')
-                    ->reorderableWithButtons()
-                    ->collapsible()
-                    ->cloneable()
-                    ->itemLabel(fn (array $state): ?string => $state['name'] ? "{$state['name']}" : 'فصل جديد')
-                    ->grid(2)
-                    ->defaultItems(1)
-                    ->collapsed(),
+                                    Forms\Components\SpatieMediaLibraryFileUpload::make('image')
+                                        ->collection('teachers-images')
+                                        ->image()
+                                        ->preserveFilenames()
+                                        ->required()
+                                        ->columnSpanFull()
+                                        ->label('صورة شخصية')
+                                        ->imageEditor()
+                                        ->imageCropAspectRatio('1:1')
+                                        ->extraInputAttributes(['dir' => 'rtl']),
+
+                                    Forms\Components\Hidden::make('school_id')
+                                        ->default(function ($operation, $state, Forms\Set $set) {
+                                            if ($operation === 'create') {
+                                                return null;
+                                            }
+                                            return $state ?? null;
+                                        })
+                                        ->dehydrated(),
+                                ]),
+                        ])
+                        ->hint('اختر أو أضف مدرسين لهذا الفصل')
+                        ->live() // Make this field reactive to form changes
+                        ->afterStateUpdated(function ($state, Forms\Set $set, Forms\Get $get) {
+                            // Handle the mapping of temporary teacher IDs to actual relationships
+                            // This will be processed in the form's save logic
+                        }),
+
+                    Forms\Components\SpatieMediaLibraryFileUpload::make('videos')
+                        ->collection('videos')
+                        ->multiple()
+                        ->acceptedFileTypes(['video/mp4', 'video/quicktime', 'video/x-msvideo', 'video/x-ms-wmv'])
+                        ->preserveFilenames()
+                        ->columnSpanFull()
+                        ->label('فيديوهات الفصل')
+                        ->downloadable()
+                        ->openable()
+                        ->helperText('قم بتحميل فيديو تعريفي أو توضيحي للفصل (الحد الأقصى 50MB)')
+                        ->hint('صيغة MP4, MOV, AVI, أو WMV')
+                        ->extraInputAttributes(['dir' => 'rtl']),
+
+                    Forms\Components\SpatieMediaLibraryFileUpload::make('images')
+                        ->collection('images')
+                        ->image()
+                        ->multiple()
+                        ->preserveFilenames()
+                        ->required()
+                        ->columnSpanFull()
+                        ->label('معرض الصور')
+                        ->reorderable()
+                        ->appendFiles()
+                        ->imageResizeMode('cover')
+                        ->imageEditor()
+                        ->helperText('قم بتحميل صور للفصل أو أعمال الطلاب أو الأنشطة')
+                        ->hint('صيغة JPEG, PNG, GIF, أو WebP')
+                        ->directory('class-gallery')
+                        ->extraInputAttributes(['dir' => 'rtl']),
+                ])
+                ->columns(2)
+                ->addActionLabel('+ إضافة فصل جديد')
+                ->reorderableWithButtons()
+                ->collapsible()
+                ->cloneable()
+                ->itemLabel(fn (array $state): ?string => $state['name'] ? "{$state['name']}" : 'فصل جديد')
+                ->grid(2)
+                ->defaultItems(1)
+                ->collapsed(),
             ]);
     }
 
@@ -458,38 +523,44 @@ class SchoolResource extends Resource
                 ->size(50),
 
             Tables\Columns\TextColumn::make('product.title')
-                ->label('الاسم')
+                ->label('اسم المدرسة')
                 ->sortable()
                 ->icon('heroicon-o-academic-cap')
                 ->color('primary'),
 
             Tables\Columns\TextColumn::make('working_duration')
+                ->label('ساعات العمل')
                 ->searchable()
                 ->icon('heroicon-o-clock')
                 ->tooltip('ساعات العمل'),
 
             Tables\Columns\TextColumn::make('founding_date')
+                ->label('تاريخ التأسيس')
                 ->date()
                 ->sortable()
                 ->icon('heroicon-o-calendar')
                 ->color('success'),
 
             Tables\Columns\TextColumn::make('address')
+                ->label('العنوان')
                 ->searchable()
                 ->icon('heroicon-o-map-pin')
-                ->tooltip('School Address'),
+                ->tooltip('عنوان المدرسة'),
 
             Tables\Columns\TextColumn::make('manager')
+                ->label('المدير')
                 ->searchable()
                 ->icon('heroicon-o-user')
                 ->color('warning'),
 
             Tables\Columns\TextColumn::make('created_at')
+                ->label('تاريخ الإنشاء')
                 ->dateTime()
                 ->sortable()
                 ->toggleable(isToggledHiddenByDefault: true),
 
             Tables\Columns\TextColumn::make('updated_at')
+                ->label('تاريخ التحديث')
                 ->dateTime()
                 ->sortable()
                 ->toggleable(isToggledHiddenByDefault: true),

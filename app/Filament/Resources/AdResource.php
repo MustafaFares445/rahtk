@@ -26,47 +26,49 @@ class AdResource extends Resource
 
     protected static ?string $recordTitleAttribute = 'title';
 
-    protected static ?string $navigationLabel = 'إعلانات';  
+    protected static ?string $navigationLabel = 'إعلانات';
 
     public static function form(Form $form): Form
     {
         return $form
             ->schema([
-                Section::make('Ad Information')
-                    ->description('Basic information about the advertisement')
+                Section::make('معلومات الإعلان')
+                    ->description('المعلومات الأساسية عن الإعلان')
                     ->schema([
                         Grid::make(2)
                             ->schema([
                                 TextInput::make('title')
                                     ->required()
                                     ->maxLength(255)
-                                    ->placeholder('Enter ad title')
+                                    ->label('عنوان الإعلان')
+                                    ->placeholder('أدخل عنوان الإعلان')
                                     ->columnSpanFull(),
 
                                 DatePicker::make('start_date')
                                     ->required()
-                                    ->label('Start Date')
+                                    ->label('تاريخ البدء')
                                     ->displayFormat('Y-m-d')
-                                    ->placeholder('Select start date'),
+                                    ->placeholder('اختر تاريخ البدء'),
 
                                 DatePicker::make('end_date')
                                     ->required()
-                                    ->label('End Date')
+                                    ->label('تاريخ الانتهاء')
                                     ->displayFormat('Y-m-d')
-                                    ->placeholder('Select end date')
+                                    ->placeholder('اختر تاريخ الانتهاء')
                                     ->after('start_date'),
 
                                 SpatieMediaLibraryFileUpload::make('image')
                                     ->collection('images')
                                     ->image()
                                     ->imageEditor()
+                                    ->label('صورة الإعلان')
                                     ->imageEditorAspectRatios([
                                         '16:9',
                                         '4:3',
                                         '1:1',
                                     ])
                                     ->columnSpanFull()
-                                    ->helperText('Upload image for this ad. Supported formats: JPG, PNG, GIF'),
+                                    ->helperText('قم بتحميل صورة للإعلان. الصيغ المدعومة: JPG, PNG, GIF'),
                             ]),
                     ]),
             ]);
@@ -76,16 +78,14 @@ class AdResource extends Resource
     {
         return $table
             ->columns([
-                ImageColumn::make('images')
-                    ->label('Image')
-                    ->square()
-                    ->stacked()
-                    ->getStateUsing(function ($record) {
-                        $media = $record->getFirstMedia('images');
-                        return $media ? $media->getUrl() : null;
-                    }),
+                Tables\Columns\ImageColumn::make('images')
+                ->label('')
+                ->size(40)
+                ->circular()
+                ->getStateUsing(fn($record) => $record->getFirstMediaUrl('images')),
 
                 TextColumn::make('title')
+                    ->label('العنوان')
                     ->searchable()
                     ->sortable()
                     ->limit(50)
@@ -98,12 +98,14 @@ class AdResource extends Resource
                     }),
 
                 TextColumn::make('start_date')
+                    ->label('تاريخ البدء')
                     ->date('Y-m-d')
                     ->sortable()
                     ->badge()
                     ->color('success'),
 
                 TextColumn::make('end_date')
+                    ->label('تاريخ الانتهاء')
                     ->date('Y-m-d')
                     ->sortable()
                     ->badge()
@@ -112,44 +114,47 @@ class AdResource extends Resource
                     }),
 
                 TextColumn::make('status')
+                    ->label('الحالة')
                     ->getStateUsing(function ($record) {
                         $now = now();
                         if ($now->isBefore($record->start_date)) {
-                            return 'Scheduled';
+                            return 'مجدول';
                         } elseif ($now->isAfter($record->end_date)) {
-                            return 'Expired';
+                            return 'منتهي';
                         } else {
-                            return 'Active';
+                            return 'نشط';
                         }
                     })
                     ->badge()
                     ->color(fn (string $state): string => match ($state) {
-                        'Active' => 'success',
-                        'Scheduled' => 'info',
-                        'Expired' => 'danger',
+                        'نشط' => 'success',
+                        'مجدول' => 'info',
+                        'منتهي' => 'danger',
                     }),
 
                 TextColumn::make('created_at')
+                    ->label('تاريخ الإنشاء')
                     ->dateTime()
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
 
                 TextColumn::make('updated_at')
+                    ->label('تاريخ التحديث')
                     ->dateTime()
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
             ])
             ->filters([
                 Tables\Filters\Filter::make('active')
-                    ->label('Active Ads')
+                    ->label('الإعلانات النشطة')
                     ->query(fn (Builder $query): Builder => $query->where('start_date', '<=', now())->where('end_date', '>=', now())),
 
                 Tables\Filters\Filter::make('scheduled')
-                    ->label('Scheduled Ads')
+                    ->label('الإعلانات المجدولة')
                     ->query(fn (Builder $query): Builder => $query->where('start_date', '>', now())),
 
                 Tables\Filters\Filter::make('expired')
-                    ->label('Expired Ads')
+                    ->label('الإعلانات المنتهية')
                     ->query(fn (Builder $query): Builder => $query->where('end_date', '<', now())),
             ])
             ->actions([

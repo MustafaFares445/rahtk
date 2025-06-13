@@ -367,25 +367,25 @@ class ProductStatics
     {
         return [
             [
-                'label' => 'Total Products',
+                'label' => 'إجمالي المنتجات',
                 'value' => number_format(self::getTotalProducts()),
                 'icon' => 'heroicon-o-shopping-bag',
                 'color' => 'primary',
             ],
             [
-                'label' => 'Urgent Products',
+                'label' => 'المنتجات العاجلة',
                 'value' => number_format(self::getUrgentProductsCount()),
                 'icon' => 'heroicon-o-bolt',
                 'color' => 'danger',
             ],
             [
-                'label' => 'Average Price',
+                'label' => 'متوسط السعر',
                 'value' => '$' . number_format(self::getAveragePrice(), 2),
                 'icon' => 'heroicon-o-currency-dollar',
                 'color' => 'success',
             ],
             [
-                'label' => 'Total Views',
+                'label' => 'إجمالي المشاهدات',
                 'value' => number_format(self::getTotalViews()),
                 'icon' => 'heroicon-o-eye',
                 'color' => 'info',

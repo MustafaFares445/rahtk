@@ -16,27 +16,27 @@ class DashboardStatsOverview extends BaseWidget
 {
     protected function getStats(): array
     {
-        // Get the current date to find active ads
+        // الحصول على التاريخ الحالي للعثور على الإعلانات النشطة
         $now = Carbon::now();
 
         return [
-            Stat::make('Total Products', Product::count())
-                ->description('Total number of all products')
+            Stat::make('إجمالي المنتجات', Product::count())
+                ->description('إجمالي عدد جميع المنتجات')
                 ->descriptionIcon('heroicon-m-shopping-bag')
                 ->color('success'),
 
-            Stat::make('Active Ads', Ad::where('start_date', '<=', $now)->where('end_date', '>=', $now)->count())
-                ->description('Advertisements currently running')
+            Stat::make('الإعلانات النشطة', Ad::where('start_date', '<=', $now)->where('end_date', '>=', $now)->count())
+                ->description('الإعلانات التي تعمل حاليًا')
                 ->descriptionIcon('heroicon-m-megaphone')
                 ->color('info'),
 
-            Stat::make('Total Schools', School::count())
-                ->description('Total number of registered schools')
+            Stat::make('إجمالي المدارس', School::count())
+                ->description('إجمالي عدد المدارس المسجلة')
                 ->descriptionIcon('heroicon-m-academic-cap')
                 ->color('warning'),
 
-            Stat::make('Total Teachers', Teacher::count())
-                ->description('Total number of teachers across all schools')
+            Stat::make('إجمالي المعلمين', Teacher::count())
+                ->description('إجمالي عدد المعلمين في جميع المدارس')
                 ->descriptionIcon('heroicon-m-users')
                 ->color('primary'),
         ];

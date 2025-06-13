@@ -17,31 +17,30 @@ class CarSeeder extends Seeder
             [
                 'product_id' => 2,
                 'model' => 'كامري',
-                'year' => '2020-01-01',
+                'year' => '2020',
                 'created_at' => now(),
                 'updated_at' => now(),
             ],
             [
                 'product_id' => 7,
                 'model' => 'أكسنت',
-                'year' => '2019-01-01',
+                'year' => '2019',
                 'created_at' => now(),
                 'updated_at' => now(),
             ],
             [
                 'product_id' => 11,
                 'model' => 'سوناتا',
-                'year' => '2021-01-01',
+                'year' => '2021',
                 'created_at' => now(),
                 'updated_at' => now(),
             ],
             [
                 'product_id' => 12,
                 'model' => 'كيا سيراتو',
-                'year' => '2018-01-01',
+                'year' => '2018',
                 'created_at' => now(),
                 'updated_at' => now(),
             ],
         ]);
-    }
-}
+

@@ -13,14 +13,6 @@ class ProductStatsOverview extends BaseWidget
     protected static ?string $pollingInterval = null;
     protected static bool $isLazy = true;
 
-    private static array $typeBadgeColors = [
-        'estate' => 'primary',
-        'car' => 'warning',
-        'electronic' => 'danger',
-        'farm' => 'info',
-        'building' => 'gray',
-    ];
-
     protected function getStats(): array
     {
         $totalProducts = Product::where('type', '!=', ProductTypes::SCHOOL->value)->count();
@@ -39,18 +31,21 @@ class ProductStatsOverview extends BaseWidget
 
         return [
             Stat::make('Total Products', $totalProducts)
-                ->description('All product types')
+                ->label('عدد المنتجات')
+                ->description('جميع أنواع المنتجات')
                 ->descriptionIcon('heroicon-o-shopping-bag')
                 ->chart($this->getChartData($typeCounts))
                 ->color('primary'),
 
             Stat::make('Urgent Products', $urgentProducts)
-                ->description('Urgent Products Count')
+                ->label('المنتحات العاجلة')
+                ->description('عدد المنتجات العاجلة')
                 ->descriptionIcon('heroicon-o-bolt')
                 ->color('warning'),
 
             Stat::make('Avg. Price', number_format($averagePrice, 2) . ' $')
-                ->description('Average across all products')
+                ->label('السعر المتوسط')
+                ->description('المتوسط عبر جميع المنتجات')
                 ->descriptionIcon('heroicon-o-currency-dollar')
                 ->color('success'),
         ];
