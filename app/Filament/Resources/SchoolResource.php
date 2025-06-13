@@ -353,8 +353,6 @@ class SchoolResource extends Resource
                 ->relationship('schoolClasses')
                 ->label('قائمة الفصول')
                 ->schema([
-                    // ... your existing form fields ...
-
                     Forms\Components\Select::make('name')
                         ->required()
                         ->options($classes)
@@ -373,7 +371,125 @@ class SchoolResource extends Resource
                         })
                         ->live(),
 
-                    // ... rest of your fields ...
+                    Forms\Components\Hidden::make('type')
+                        ->required()
+                        ->columnSpan(1)
+                        ->label('المستوى التعليمي')
+                        ->dehydrated(true),
+
+                    Forms\Components\Select::make('teachers')
+                        ->label('المدرسون المعينون')
+                        ->multiple()
+                        ->searchable()
+                        ->columnSpanFull()
+                        ->relationship('teachers', 'name')
+                        ->options(function (Forms\Get $get, $record) {
+                            // Get the school ID from the current context
+                            $schoolId = null;
+
+                            // Try to get school ID from the record (editing existing school)
+                            if ($record) {
+                                $schoolId = $record->school?->id;;
+                            }
+
+                            // If no school ID from record, try to get from form state
+                            if (!$schoolId) {
+                                $schoolId = $get('../../id'); // Adjust path based on your form structure
+                            }
+
+                            if (!$schoolId) {
+                                return [];
+                            }
+
+                            // Get all teachers for this school
+                            return \App\Models\Teacher::where('school_id', $schoolId)
+                                ->pluck('name', 'id')
+                                ->map(function ($name, $id) {
+                                    $teacher = \App\Models\Teacher::find($id);
+                                    return $name . ' - ' . ($teacher->job_title ?? '');
+                                })
+                                ->toArray();
+                        })
+                        ->getOptionLabelFromRecordUsing(fn ($record) => $record->name . ' - ' . $record->job_title)
+                        ->preload()
+                        ->createOptionAction(
+                            fn ($action) => $action->modalHeading('إضافة مدرس جديد')
+                        )
+                        ->createOptionForm([
+                            Forms\Components\Section::make('معلومات المدرس')
+                                ->columns(2)
+                                ->schema([
+                                    Forms\Components\TextInput::make('name')
+                                        ->required()
+                                        ->maxLength(255)
+                                        ->label('الاسم الكامل')
+                                        ->extraInputAttributes(['dir' => 'rtl']),
+
+                                    Forms\Components\TextInput::make('job_title')
+                                        ->required()
+                                        ->maxLength(255)
+                                        ->label('المسمى الوظيفي')
+                                        ->extraInputAttributes(['dir' => 'rtl']),
+
+                                    Forms\Components\SpatieMediaLibraryFileUpload::make('image')
+                                        ->collection('teachers-images')
+                                        ->image()
+                                        ->preserveFilenames()
+                                        ->required()
+                                        ->columnSpanFull()
+                                        ->label('صورة شخصية')
+                                        ->imageEditor()
+                                        ->imageCropAspectRatio('1:1')
+                                        ->extraInputAttributes(['dir' => 'rtl']),
+
+                                    Forms\Components\Hidden::make('school_id')
+                                        ->default(function (Forms\Get $get) {
+                                            // Get school ID from the parent form
+                                            return $get('../../../id'); // Adjust path based on your form structure
+                                        })
+                                        ->dehydrated(),
+                                ]),
+                        ])
+                        ->createOptionUsing(function (array $data, Forms\Get $get) {
+                            // Create the teacher with the school ID
+                            $schoolId = $get('../../id') ?? $data['school_id'];
+                            $data['school_id'] = $schoolId;
+
+                            $teacher = \App\Models\Teacher::create($data);
+
+                            return $teacher->id;
+                        })
+                        ->hint('اختر أو أضف مدرسين لهذا الفصل')
+                        ->live(),
+
+                    Forms\Components\SpatieMediaLibraryFileUpload::make('videos')
+                        ->collection('videos')
+                        ->multiple()
+                        ->acceptedFileTypes(['video/mp4', 'video/quicktime', 'video/x-msvideo', 'video/x-ms-wmv'])
+                        ->preserveFilenames()
+                        ->columnSpanFull()
+                        ->label('فيديوهات الفصل')
+                        ->downloadable()
+                        ->openable()
+                        ->helperText('قم بتحميل فيديو تعريفي أو توضيحي للفصل (الحد الأقصى 50MB)')
+                        ->hint('صيغة MP4, MOV, AVI, أو WMV')
+                        ->extraInputAttributes(['dir' => 'rtl']),
+
+                    Forms\Components\SpatieMediaLibraryFileUpload::make('images')
+                        ->collection('images')
+                        ->image()
+                        ->multiple()
+                        ->preserveFilenames()
+                        ->columnSpanFull()
+                        ->label('معرض الصور')
+                        ->reorderable()
+                        ->appendFiles()
+                        ->imageResizeMode('cover')
+                        ->imageEditor()
+                        ->helperText('قم بتحميل صور للفصل أو أعمال الطلاب أو الأنشطة')
+                        ->hint('صيغة JPEG, PNG, GIF, أو WebP')
+                        ->directory('class-gallery')
+                        ->extraInputAttributes(['dir' => 'rtl']),
                 ])
                 ->columns(2)
                 ->addActionLabel('+ إضافة فصل جديد')

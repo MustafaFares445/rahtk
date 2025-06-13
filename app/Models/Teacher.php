@@ -34,8 +34,6 @@ class Teacher extends Model implements HasMedia
         });
     }
 
-
-
     public function school(): BelongsTo
     {
         return $this->belongsTo(School::class);
