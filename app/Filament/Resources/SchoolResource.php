@@ -170,17 +170,7 @@ class SchoolResource extends Resource
                     ->placeholder('اختر السنة')
                     ->hint('متى تأسست المدرسة؟')
                     ->prefixIcon('heroicon-o-cake')
-                    ->extraInputAttributes(['dir' => 'rtl']),
-
-                Forms\Components\TextInput::make('address')
-                    ->required()
-                    ->maxLength(255)
-                    ->columnSpanFull()
-                    ->label('العنوان الكامل')
-                    ->placeholder('شارع التعليم، مدينة المعرفة')
-                    ->hint('الموقع الفعلي للمدرسة')
-                    ->prefixIcon('heroicon-o-map-pin')
-                    ->extraInputAttributes(['dir' => 'rtl']),
+                    ->extraInputAttributes(['dir' => 'rtl'])
             ]);
     }
 
