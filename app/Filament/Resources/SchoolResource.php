@@ -191,7 +191,7 @@ class SchoolResource extends Resource
                     ->prefixIcon('heroicon-o-user')
                     ->extraInputAttributes(['dir' => 'rtl']),
 
-                Forms\Components\SpatieMediaLibraryFileUpload::make('images')
+                Forms\Components\SpatieMediaLibraryFileUpload::make('image')
                     ->collection('managers-images')
                     ->image()
                     ->preserveFilenames()
