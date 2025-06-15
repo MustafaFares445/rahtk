@@ -55,8 +55,42 @@ class SearchController extends Controller
      */
     public function getFilters(Request $request)
     {
+        $data = [
+            'estate' => [
+                'rooms' => null,
+                'area' => null,
+                'floorsNumber' => null,
+                'isFurnished' => null,
+                'floor' => null,
+            ],
+            'car' => [
+                'model' => null,
+                'year' => null,
+                'kilo' => null,
+            ],
+            'school' => [
+                'quate' => null,
+                'workingDuration' => null,
+                'foundingDate' => null,
+                'manager' => null,
+                'managerDescription' => null,
+            ],
+            'electronic' => [
+                'model' => null,
+                'brand' => null,
+                'year' => null,
+            ],
+            'building' => [
+                'type' => null,
+                'brand' => null,
+                'options' => null,
+            ],
+        ];
+
         $filters = [];
         $modelQuery = null;
+        $currentType = null;
+
         switch($request->get('type')) {
             case ProductTypes::ESTATE->value:
                 $filters = [
@@ -67,6 +101,7 @@ class SearchController extends Controller
                     'floor',
                 ];
                 $modelQuery = Estate::query();
+                $currentType = 'estate';
                 break;
             case ProductTypes::CAR->value:
                 $filters = [
@@ -75,6 +110,7 @@ class SearchController extends Controller
                     'kilo',
                 ];
                 $modelQuery = Car::query();
+                $currentType = 'car';
                 break;
             case ProductTypes::SCHOOL->value:
                 $filters = [
@@ -85,6 +121,7 @@ class SearchController extends Controller
                     'manager_description',
                 ];
                 $modelQuery = School::query();
+                $currentType = 'school';
                 break;
             case ProductTypes::ELECTRONIC->value:
                 $filters = [
@@ -93,6 +130,7 @@ class SearchController extends Controller
                     'year',
                 ];
                 $modelQuery = Electronic::query();
+                $currentType = 'electronic';
                 break;
             case ProductTypes::BUILDING->value:
                 $filters = [
@@ -101,6 +139,7 @@ class SearchController extends Controller
                     'options',
                 ];
                 $modelQuery = Building::query();
+                $currentType = 'building';
                 break;
             default:
                 throw new BadRequestException('invalid type.');
@@ -109,15 +148,14 @@ class SearchController extends Controller
 
         $productsFilters = $modelQuery->get($filters);
 
-        $data = [];
-        foreach($filters as $filter){
+        // Populate only the current type's properties with actual data
+        foreach($filters as $filter) {
             $camelCaseKey = lcfirst(str_replace('_', '', ucwords($filter, '_')));
-            $data[$camelCaseKey] = $productsFilters->pluck($filter)->values()->unique()->toArray();
+            $data[$currentType][$camelCaseKey] = $productsFilters->pluck($filter)->values()->unique()->toArray();
         }
 
         return $data;
     }
-
     /**
      * @OA\Get(
      *     path="/api/search",
