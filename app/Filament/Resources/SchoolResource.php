@@ -102,19 +102,9 @@ class SchoolResource extends Resource
                 Forms\Components\Hidden::make('type')
                     ->default(ProductTypes::SCHOOL->value),
 
-                Forms\Components\SpatieMediaLibraryFileUpload::make('video')
-                    ->collection('videos')
-                    ->multiple()
-                    ->acceptedFileTypes(['video/mp4', 'video/quicktime', 'video/x-msvideo', 'video/x-ms-wmv'])
-                    ->preserveFilenames()
-                    ->label('فيديوهات المدرسة')
-                    ->helperText('قم بتحميل ملف فيديو واحد أو أكثر (MP4, QuickTime, AVI, WMV) للمدرسة.')
-                    ->extraInputAttributes(['dir' => 'rtl']),
-
-                Forms\Components\SpatieMediaLibraryFileUpload::make('images')
-                    ->collection('images')
+                Forms\Components\SpatieMediaLibraryFileUpload::make('image')
+                    ->collection('primary-image')
                     ->image()
-                    ->multiple()
                     ->preserveFilenames()
                     ->required()
                     ->label('صور المدرسة')
@@ -134,7 +124,6 @@ class SchoolResource extends Resource
             ->collapsible()
             ->columns(2)
             ->schema([
-                Forms\Components\Textarea::make('quate')
                     ->columnSpanFull()
                     ->label('شعار المدرسة')
                     ->placeholder('أدخل شعار أو مقولة ملهمة للمدرسة...')
@@ -233,7 +222,7 @@ class SchoolResource extends Resource
             ->collapsible()
             ->schema([
                 Forms\Components\SpatieMediaLibraryFileUpload::make('images')
-                    ->collection('services-images')
+                    ->collection('images')
                     ->image()
                     ->multiple()
                     ->preserveFilenames()
@@ -325,8 +314,9 @@ class SchoolResource extends Resource
     protected static function classManagementSection(): Forms\Components\Section
     {
         $classes = [
-            'kga' => 'KGA',
-            'kgb' => 'KGB',
+            'kg1' => 'KG1',
+            'kg2' => 'KG2',
+            'kg3' => 'KG3',
             '1st' => 'الصف الأول',
             '2nd' => 'الصف الثاني',
             '3rd' => 'الصف الثالث',

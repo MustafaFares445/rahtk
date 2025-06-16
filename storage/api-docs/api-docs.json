@@ -33,6 +33,39 @@
                 }
             }
         },
+        "/api/contact": {
+            "get": {
+                "summary": "Get the first contact",
+                "description": "Returns the first contact from the database",
+                "operationId": "f9cc593e3aed8ed5ba025087796c4db2",
+                "responses": {
+                    "200": {
+                        "description": "Successful operation",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "id": {
+                                            "type": "integer",
+                                            "example": 1
+                                        },
+                                        "whatsapp": {
+                                            "type": "string",
+                                            "example": "https://whatsapp.com/phone=+9631123131231"
+                                        },
+                                        "phone": {
+                                            "type": "string",
+                                            "example": "j+96311231231"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
         "/api/home/products": {
             "get": {
                 "tags": [
@@ -251,7 +284,7 @@
                     {
                         "name": "type",
                         "in": "query",
-                        "description": "The type of product to search for. Must be one of the following: estate, car, school, electronic, building.",
+                        "description": "The type of product to search for. Must be one of the following: estate, car, school, electronic, building, farm.",
                         "required": true,
                         "schema": {
                             "type": "string",
@@ -260,7 +293,8 @@
                                 "car",
                                 "school",
                                 "electronic",
-                                "building"
+                                "building",
+                                "farm"
                             ]
                         }
                     },
@@ -711,8 +745,11 @@
                     "managerImage": {
                         "$ref": "#/components/schemas/MediaResource"
                     },
-                    "servicesImages": {
-                        "description": "The list of service images",
+                    "primaryImage": {
+                        "$ref": "#/components/schemas/MediaResource"
+                    },
+                    "media": {
+                        "description": "The list of media associated with the school",
                         "type": "array",
                         "items": {
                             "$ref": "#/components/schemas/MediaResource"

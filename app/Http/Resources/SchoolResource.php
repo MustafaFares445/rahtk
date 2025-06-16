@@ -16,11 +16,6 @@ use Illuminate\Http\Resources\Json\JsonResource;
  *         description="The ID of the school"
  *     ),
  *     @OA\Property(
- *         property="quate",
- *         type="string",
- *         description="The quote of the school"
- *     ),
- *     @OA\Property(
  *         property="workingDuration",
  *         type="string",
  *         description="The working duration of the school"
@@ -58,10 +53,15 @@ use Illuminate\Http\Resources\Json\JsonResource;
  *         description="The image of the manager"
  *     ),
  *     @OA\Property(
- *         property="servicesImages",
+ *         property="primaryImage",
+ *         ref="#/components/schemas/MediaResource",
+ *         description="The primary image of the school"
+ *     ),
+ *     @OA\Property(
+ *         property="media",
  *         type="array",
  *         @OA\Items(ref="#/components/schemas/MediaResource"),
- *         description="The list of service images"
+ *         description="The list of media associated with the school"
  *     )
  * )
  */
@@ -75,9 +75,9 @@ class SchoolResource extends JsonResource
      */
     public function toArray($request)
     {
+
         return [
             'id' => $this->id,
-            'quate' => $this->quate,
             'workingDuration' => $this->working_duration,
             'foundingDate' => $this->founding_date,
             'address' => $this->address,
@@ -85,12 +85,12 @@ class SchoolResource extends JsonResource
             'managerDescription' => $this->manager_description,
             'schoolClasses' => SchoolClassResource::collection($this->whenLoaded('schoolClasses')),
             'managerImage' => MediaResource::make($this->getFirstMedia('managers-images')),
+            'primaryImage' => MediaResource::make($this->getFirstMedia('primary-image')),
             'media' => $this->when($this->getAllMedia, MediaResource::collection(
                 $this->media->filter(function ($media) {
-                    return in_array($media->collection_name, ['images', 'videos']);
+                    return in_array($media->collection_name, ['primary-image']);
                 })
             )),
-            'servicesImages' => MediaResource::collection($this->whenLoaded('media' , $this->getMedia('services-images'))),
         ];
     }
 }

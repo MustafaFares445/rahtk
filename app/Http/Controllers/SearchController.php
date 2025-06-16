@@ -10,6 +10,8 @@ use App\Models\Electronic;
 use App\Models\Estate;
 use App\Models\Product;
 use App\Models\School;
+use App\Models\Farm;
+use App\Models\SchoolClass;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
 use Symfony\Component\HttpFoundation\Exception\BadRequestException;
@@ -79,11 +81,21 @@ class SearchController extends Controller
                 'kilo' => null,
             ],
             'school' => [
-                'quate' => null,
-                'workingDuration' => null,
-                'foundingDate' => null,
-                'manager' => null,
-                'managerDescription' => null,
+                'kg1' => 'KG1',
+                'kg2' => 'KG2',
+                'kg3' => 'KG3',
+                '1st' => 'الصف الأول',
+                '2nd' => 'الصف الثاني',
+                '3rd' => 'الصف الثالث',
+                '4th' => 'الصف الرابع',
+                '5th' => 'الصف الخامس',
+                '6th' => 'الصف السادس',
+                '7th' => 'الصف السابع',
+                '8th' => 'الصف الثامن',
+                '9th' => 'الصف التاسع',
+                '10th' => 'الصف العاشر',
+                '11th' => 'الصف الحادي عشر',
+                '12th' => 'بكالوريا',
             ],
             'electronic' => [
                 'model' => null,
@@ -94,6 +106,13 @@ class SearchController extends Controller
                 'type' => null,
                 'brand' => null,
                 'options' => null,
+            ],
+            'farm' => [
+                'type' => null,
+                'bedrooms' => null,
+                'bathrooms' => null,
+                'floors_number' => null,
+                'size' => null,
             ],
         ];
 
@@ -124,11 +143,21 @@ class SearchController extends Controller
                 break;
             case ProductTypes::SCHOOL->value:
                 $filters = [
-                    'quate',
-                    'working_duration',
-                    'founding_date',
-                    'manager',
-                    'manager_description',
+                    'kg1' => 'KG1',
+                    'kg2' => 'KG2',
+                    'kg3' => 'KG3',
+                    '1st' => 'الصف الأول',
+                    '2nd' => 'الصف الثاني',
+                    '3rd' => 'الصف الثالث',
+                    '4th' => 'الصف الرابع',
+                    '5th' => 'الصف الخامس',
+                    '6th' => 'الصف السادس',
+                    '7th' => 'الصف السابع',
+                    '8th' => 'الصف الثامن',
+                    '9th' => 'الصف التاسع',
+                    '10th' => 'الصف العاشر',
+                    '11th' => 'الصف الحادي عشر',
+                    '12th' => 'بكالوريا',
                 ];
                 $modelQuery = School::query();
                 $currentType = 'school';
@@ -150,6 +179,17 @@ class SearchController extends Controller
                 ];
                 $modelQuery = Building::query();
                 $currentType = 'building';
+                break;
+            case ProductTypes::FARM->value:
+                $filters = [
+                    'type',
+                    'bedrooms',
+                    'bathrooms',
+                    'floors_number',
+                    'size',
+                ];
+                $modelQuery = Farm::query();
+                $currentType = 'farm';
                 break;
             default:
                 throw new BadRequestException('invalid type.');
@@ -175,11 +215,11 @@ class SearchController extends Controller
      *     @OA\Parameter(
      *         name="type",
      *         in="query",
-     *         description="The type of product to search for. Must be one of the following: estate, car, school, electronic, building.",
+     *         description="The type of product to search for. Must be one of the following: estate, car, school, electronic, building, farm.",
      *         required=true,
      *         @OA\Schema(
      *             type="string",
-     *             enum={"estate", "car", "school", "electronic", "building"}
+     *             enum={"estate", "car", "school", "electronic", "building", "farm"}
      *         )
      *     ),
      *     @OA\Parameter(
@@ -244,9 +284,14 @@ class SearchController extends Controller
             ->when($request->has('maxPrice'), fn($q) => $q->where('price', '<=', $request->get('maxPrice')));
 
         if($request->has('text')){
-            $productsQuery->where(function($q) use ($request) {
-                $q->where('title' , 'like', '%' . $request->get('text') . '%')
-                    ->orWhere('address' , 'like', '%' . $request->get('text') . '%');
+            $text = $request->get('text');
+            $words = explode(' ', $text);
+
+            $productsQuery->where(function($q) use ($words) {
+                foreach ($words as $word) {
+                    $q->orWhere('title', 'like', '%' . $word . '%')
+                      ->orWhere('address', 'like', '%' . $word . '%');
+                }
             });
         }
 
@@ -261,6 +306,16 @@ class SearchController extends Controller
 
         }elseif($request->has('type')){
             $productsQuery->whereHas($request->get('type'));
+        }
+
+        if($request->has('schoolClasses')){
+            School::query()->whereHas('schoolClasses' , function($q) use ($request){
+                $q->where(function($subQuery) use ($request) {
+                    foreach($request->get('schoolClasses') as $schooolClass){
+                        $subQuery->orWhere('type' , $schooolClass);
+                    }
+                });
+            });
         }
 
         return ProductResource::collection($productsQuery->paginate($request->get('perPage' , 15)));

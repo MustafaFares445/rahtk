@@ -19,7 +19,6 @@ class School extends Model implements HasMedia
      */
     protected $fillable = [
         'product_id',
-        'quate',
         'working_duration',
         'founding_date',
         'manager',

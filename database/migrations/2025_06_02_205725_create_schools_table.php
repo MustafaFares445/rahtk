@@ -16,7 +16,6 @@ return new class extends Migration
         Schema::create('schools', function (Blueprint $table) {
             $table->id();
             $table->foreignId('product_id')->references('id')->on('products');
-            $table->text('quate')->nullable();
             $table->string('working_duration');
             $table->string('founding_date');
             $table->string('manager');
