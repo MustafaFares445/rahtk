@@ -21,11 +21,12 @@ class SearchController extends Controller
      * @OA\Get(
      *     path="/api/search/filters",
      *     summary="Get filters for a specific product type",
+     *     description="Retrieve a list of available filters for a given product type. The filters are dynamically generated based on the product type.",
      *     tags={"Search"},
      *     @OA\Parameter(
      *         name="type",
      *         in="query",
-     *         description="The type of product to filter",
+     *         description="The type of product to filter. Must be one of the following: estate, car, school, electronic, building.",
      *         required=true,
      *         @OA\Schema(
      *             type="string",
@@ -40,7 +41,16 @@ class SearchController extends Controller
      *             @OA\AdditionalProperties(
      *                 type="array",
      *                 @OA\Items(type="string")
-     *             )
+     *             ),
+     *             example={
+     *                 "estate": {
+     *                     "rooms": "1, 2, 3",
+     *                     "area": "100, 200, 300",
+     *                     "floorsNumber": "1, 2",
+     *                     "isFurnished": "true, false",
+     *                     "floor": "1, 2, 3"
+     *                 }
+     *             }
      *         )
      *     ),
      *     @OA\Response(
@@ -148,7 +158,6 @@ class SearchController extends Controller
 
         $productsFilters = $modelQuery->get($filters);
 
-        // Populate only the current type's properties with actual data
         foreach($filters as $filter) {
             $camelCaseKey = lcfirst(str_replace('_', '', ucwords($filter, '_')));
             $data[$currentType][$camelCaseKey] = $productsFilters->pluck($filter)->values()->unique()->toArray();
@@ -156,15 +165,17 @@ class SearchController extends Controller
 
         return $data;
     }
+
     /**
      * @OA\Get(
      *     path="/api/search",
      *     summary="Search for products based on type and filters",
+     *     description="Search for products by specifying a product type and optional filters. The results can be paginated.",
      *     tags={"Search"},
      *     @OA\Parameter(
      *         name="type",
      *         in="query",
-     *         description="The type of product to search for",
+     *         description="The type of product to search for. Must be one of the following: estate, car, school, electronic, building.",
      *         required=true,
      *         @OA\Schema(
      *             type="string",
@@ -174,14 +185,14 @@ class SearchController extends Controller
      *     @OA\Parameter(
      *         name="text",
      *         in="query",
-     *         description="Text to search in product title or address",
+     *         description="Text to search in product title or address.",
      *         required=false,
      *         @OA\Schema(type="string")
      *     ),
      *     @OA\Parameter(
      *         name="filters",
      *         in="query",
-     *         description="Filters to apply to the search. Each filter should be an array where the first element is the filter key and the second is the value.",
+     *         description="Filters to apply to the search. Each filter should be an array where the first element is the filter key and the second is the value. Example: [['rooms', 2], ['area', 100]].",
      *         required=false,
      *         @OA\Schema(
      *             type="array",
@@ -194,7 +205,7 @@ class SearchController extends Controller
      *     @OA\Parameter(
      *         name="perPage",
      *         in="query",
-     *         description="Number of items per page",
+     *         description="Number of items per page. Default is 15.",
      *         required=false,
      *         @OA\Schema(type="integer", default=15)
      *     ),
@@ -222,11 +233,15 @@ class SearchController extends Controller
             'type' => ['nullable', 'string', Rule::in(array_map(fn($case) => $case->value, ProductTypes::cases()))],
             'isUrgent' => 'nullable|boolean',
             'discount' => 'nullable|boolean',
+            'minPrice' => 'nullable|numeric|min:0',
+            'maxPrice' => 'nullable|numeric|min:0',
         ]);
 
         $productsQuery = Product::with(['media' , 'farm' , 'estate' , 'car' , 'school' , 'electronic'])
             ->when($request->has('isUrgent') , fn($q) => $q->where('is_urgent' , true))
-            ->when($request->has('discount') , fn($q) => $q->whereNotNull('discount'));
+            ->when($request->has('discount') , fn($q) => $q->whereNotNull('discount'))
+            ->when($request->has('minPrice'), fn($q) => $q->where('price', '>=', $request->get('minPrice')))
+            ->when($request->has('maxPrice'), fn($q) => $q->where('price', '<=', $request->get('maxPrice')));
 
         if($request->has('text')){
             $productsQuery->where(function($q) use ($request) {

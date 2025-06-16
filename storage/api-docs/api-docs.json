@@ -174,12 +174,13 @@
                     "Search"
                 ],
                 "summary": "Get filters for a specific product type",
+                "description": "Retrieve a list of available filters for a given product type. The filters are dynamically generated based on the product type.",
                 "operationId": "c84172dc4f5586c9e7501177135f380c",
                 "parameters": [
                     {
                         "name": "type",
                         "in": "query",
-                        "description": "The type of product to filter",
+                        "description": "The type of product to filter. Must be one of the following: estate, car, school, electronic, building.",
                         "required": true,
                         "schema": {
                             "type": "string",
@@ -205,6 +206,15 @@
                                         "items": {
                                             "type": "string"
                                         }
+                                    }
+                                },
+                                "example": {
+                                    "estate": {
+                                        "rooms": "1, 2, 3",
+                                        "area": "100, 200, 300",
+                                        "floorsNumber": "1, 2",
+                                        "isFurnished": "true, false",
+                                        "floor": "1, 2, 3"
                                     }
                                 }
                             }
@@ -235,12 +245,13 @@
                     "Search"
                 ],
                 "summary": "Search for products based on type and filters",
+                "description": "Search for products by specifying a product type and optional filters. The results can be paginated.",
                 "operationId": "2754ee3c6371023cefd5b35cf65e9e07",
                 "parameters": [
                     {
                         "name": "type",
                         "in": "query",
-                        "description": "The type of product to search for",
+                        "description": "The type of product to search for. Must be one of the following: estate, car, school, electronic, building.",
                         "required": true,
                         "schema": {
                             "type": "string",
@@ -256,7 +267,7 @@
                     {
                         "name": "text",
                         "in": "query",
-                        "description": "Text to search in product title or address",
+                        "description": "Text to search in product title or address.",
                         "required": false,
                         "schema": {
                             "type": "string"
@@ -265,7 +276,7 @@
                     {
                         "name": "filters",
                         "in": "query",
-                        "description": "Filters to apply to the search. Each filter should be an array where the first element is the filter key and the second is the value.",
+                        "description": "Filters to apply to the search. Each filter should be an array where the first element is the filter key and the second is the value. Example: [['rooms', 2], ['area', 100]].",
                         "required": false,
                         "schema": {
                             "type": "array",
@@ -280,7 +291,7 @@
                     {
                         "name": "perPage",
                         "in": "query",
-                        "description": "Number of items per page",
+                        "description": "Number of items per page. Default is 15.",
                         "required": false,
                         "schema": {
                             "type": "integer",
