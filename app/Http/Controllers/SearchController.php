@@ -79,7 +79,23 @@ class SearchController extends Controller
                 'model' => null,
                 'year' => null,
             ],
-            'school' => [],
+            'school' => [
+                'kg1',
+                'kg2',
+                'kg3',
+                '1st',
+                '2nd',
+                '3rd',
+                '4th',
+                '5th',
+                '6th',
+                '7th',
+                '8th',
+                '9th',
+                '10th',
+                '11th',
+                '12th',
+            ],
             'electronic' => [
                 'model' => null,
                 'brand' => null,
@@ -124,23 +140,7 @@ class SearchController extends Controller
                 $currentType = 'car';
                 break;
             case ProductTypes::SCHOOL->value:
-                $filters = [
-                    'kg1',
-                    'kg2',
-                    'kg3',
-                    '1st',
-                    '2nd',
-                    '3rd',
-                    '4th',
-                    '5th',
-                    '6th',
-                    '7th',
-                    '8th',
-                    '9th',
-                    '10th',
-                    '11th',
-                    '12th',
-                ];
+                $filters = [];
                 $modelQuery = School::query();
                 $currentType = 'school';
                 break;
@@ -178,15 +178,15 @@ class SearchController extends Controller
                 break;
         }
 
-        if($request->get('type') == 'school'){
-            return $filters;
-        }
-
         $productsFilters = $modelQuery->get($filters);
 
         foreach($filters as $filter) {
             $camelCaseKey = lcfirst(str_replace('_', '', ucwords($filter, '_')));
             $data[$currentType][$camelCaseKey] = $productsFilters->pluck($filter)->values()->unique()->toArray();
+        }
+
+        if(!$request->get('type') == 'school'){
+            $data['school'] = [];
         }
 
         return $data;
