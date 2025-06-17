@@ -50,8 +50,8 @@ class SchoolResource extends Resource
         return $table
             ->columns(self::tableColumns())
             ->filters([
-                // يمكن إضافة الفلاتر هنا
-            ])
+
+                ])
             ->actions([
                 Tables\Actions\EditAction::make(),
             ])
@@ -124,14 +124,6 @@ class SchoolResource extends Resource
             ->collapsible()
             ->columns(2)
             ->schema([
-                    ->columnSpanFull()
-                    ->label('شعار المدرسة')
-                    ->placeholder('أدخل شعار أو مقولة ملهمة للمدرسة...')
-                    ->rows(3)
-                    ->maxLength(500)
-                    ->helperText('عبارة قصيرة تُمثل مدرستك')
-                    ->extraInputAttributes(['class' => 'prose max-w-full', 'dir' => 'rtl']),
-
                 Forms\Components\TextInput::make('working_duration')
                     ->required()
                     ->maxLength(255)

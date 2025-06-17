@@ -323,6 +323,56 @@
                         }
                     },
                     {
+                        "name": "isUrgent",
+                        "in": "query",
+                        "description": "Filter by urgent products.",
+                        "required": false,
+                        "schema": {
+                            "type": "boolean"
+                        }
+                    },
+                    {
+                        "name": "discount",
+                        "in": "query",
+                        "description": "Filter by products with discount.",
+                        "required": false,
+                        "schema": {
+                            "type": "boolean"
+                        }
+                    },
+                    {
+                        "name": "minPrice",
+                        "in": "query",
+                        "description": "Minimum price filter.",
+                        "required": false,
+                        "schema": {
+                            "type": "number",
+                            "format": "float"
+                        }
+                    },
+                    {
+                        "name": "maxPrice",
+                        "in": "query",
+                        "description": "Maximum price filter.",
+                        "required": false,
+                        "schema": {
+                            "type": "number",
+                            "format": "float"
+                        }
+                    },
+                    {
+                        "name": "schoolClasses",
+                        "in": "query",
+                        "description": "Filter by school classes.",
+                        "required": false,
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    {
                         "name": "perPage",
                         "in": "query",
                         "description": "Number of items per page. Default is 15.",
@@ -709,10 +759,6 @@
                     "id": {
                         "description": "The ID of the school",
                         "type": "integer"
-                    },
-                    "quate": {
-                        "description": "The quote of the school",
-                        "type": "string"
                     },
                     "workingDuration": {
                         "description": "The working duration of the school",

@@ -243,6 +243,44 @@ class SearchController extends Controller
      *         )
      *     ),
      *     @OA\Parameter(
+     *         name="isUrgent",
+     *         in="query",
+     *         description="Filter by urgent products.",
+     *         required=false,
+     *         @OA\Schema(type="boolean")
+     *     ),
+     *     @OA\Parameter(
+     *         name="discount",
+     *         in="query",
+     *         description="Filter by products with discount.",
+     *         required=false,
+     *         @OA\Schema(type="boolean")
+     *     ),
+     *     @OA\Parameter(
+     *         name="minPrice",
+     *         in="query",
+     *         description="Minimum price filter.",
+     *         required=false,
+     *         @OA\Schema(type="number", format="float")
+     *     ),
+     *     @OA\Parameter(
+     *         name="maxPrice",
+     *         in="query",
+     *         description="Maximum price filter.",
+     *         required=false,
+     *         @OA\Schema(type="number", format="float")
+     *     ),
+     *     @OA\Parameter(
+     *         name="schoolClasses",
+     *         in="query",
+     *         description="Filter by school classes.",
+     *         required=false,
+     *         @OA\Schema(
+     *             type="array",
+     *             @OA\Items(type="string")
+     *         )
+     *     ),
+     *     @OA\Parameter(
      *         name="perPage",
      *         in="query",
      *         description="Number of items per page. Default is 15.",
@@ -309,7 +347,7 @@ class SearchController extends Controller
         }
 
         if($request->has('schoolClasses')){
-            School::query()->whereHas('schoolClasses' , function($q) use ($request){
+            $productsQuery->whereHas('school.schoolClasses' , function($q) use ($request){
                 $q->where(function($subQuery) use ($request) {
                     foreach($request->get('schoolClasses') as $schooolClass){
                         $subQuery->orWhere('type' , $schooolClass);
