@@ -178,6 +178,10 @@ class SearchController extends Controller
                 break;
         }
 
+        if($request->get('school') == 'school'){
+            return $filters;
+        }
+
         $productsFilters = $modelQuery->get($filters);
 
         foreach($filters as $filter) {
