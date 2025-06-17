@@ -176,15 +176,15 @@ class SearchController extends Controller
                 break;
         }
 
-        $productsFilters = $modelQuery->get($filters);
-
-        foreach($filters as $filter) {
-            $camelCaseKey = lcfirst(str_replace('_', '', ucwords($filter, '_')));
-            $data[$currentType][$camelCaseKey] = $productsFilters->pluck($filter)->values()->unique()->toArray();
-        }
-
         if($request->get('type') != 'school'){
             $data['school'] = [];
+
+            $productsFilters = $modelQuery->get($filters);
+
+            foreach($filters as $filter) {
+                $camelCaseKey = lcfirst(str_replace('_', '', ucwords($filter, '_')));
+                $data[$currentType][$camelCaseKey] = $productsFilters->pluck($filter)->values()->unique()->toArray();
+            }
         }
 
         return $data;
