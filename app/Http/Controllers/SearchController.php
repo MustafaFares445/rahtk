@@ -79,23 +79,7 @@ class SearchController extends Controller
                 'model' => null,
                 'year' => null,
             ],
-            'school' => [
-                'kg1',
-                'kg2',
-                'kg3',
-                '1st',
-                '2nd',
-                '3rd',
-                '4th',
-                '5th',
-                '6th',
-                '7th',
-                '8th',
-                '9th',
-                '10th',
-                '11th',
-                '12th',
-            ],
+            'school' => [],
             'electronic' => [
                 'model' => null,
                 'brand' => null,
@@ -140,7 +124,23 @@ class SearchController extends Controller
                 $currentType = 'car';
                 break;
             case ProductTypes::SCHOOL->value:
-                $filters = [];
+                $filters = [
+                    'kg1',
+                    'kg2',
+                    'kg3',
+                    '1st',
+                    '2nd',
+                    '3rd',
+                    '4th',
+                    '5th',
+                    '6th',
+                    '7th',
+                    '8th',
+                    '9th',
+                    '10th',
+                    '11th',
+                    '12th',
+                ];
                 $modelQuery = School::query();
                 $currentType = 'school';
                 break;
