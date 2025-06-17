@@ -178,7 +178,7 @@ class SearchController extends Controller
                 break;
         }
 
-        if($request->get('school') == 'school'){
+        if($request->get('type') == 'school'){
             return $filters;
         }
 
