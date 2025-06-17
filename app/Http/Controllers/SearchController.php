@@ -78,24 +78,23 @@ class SearchController extends Controller
             'car' => [
                 'model' => null,
                 'year' => null,
-                'kilo' => null,
             ],
             'school' => [
-                'kg1' => 'KG1',
-                'kg2' => 'KG2',
-                'kg3' => 'KG3',
-                '1st' => 'الصف الأول',
-                '2nd' => 'الصف الثاني',
-                '3rd' => 'الصف الثالث',
-                '4th' => 'الصف الرابع',
-                '5th' => 'الصف الخامس',
-                '6th' => 'الصف السادس',
-                '7th' => 'الصف السابع',
-                '8th' => 'الصف الثامن',
-                '9th' => 'الصف التاسع',
-                '10th' => 'الصف العاشر',
-                '11th' => 'الصف الحادي عشر',
-                '12th' => 'بكالوريا',
+                'kg1',
+                'kg2',
+                'kg3',
+                '1st',
+                '2nd',
+                '3rd',
+                '4th',
+                '5th',
+                '6th',
+                '7th',
+                '8th',
+                '9th',
+                '10th',
+                '11th',
+                '12th',
             ],
             'electronic' => [
                 'model' => null,
@@ -136,29 +135,12 @@ class SearchController extends Controller
                 $filters = [
                     'model',
                     'year',
-                    'kilo',
                 ];
                 $modelQuery = Car::query();
                 $currentType = 'car';
                 break;
             case ProductTypes::SCHOOL->value:
-                $filters = [
-                    'kg1' => 'KG1',
-                    'kg2' => 'KG2',
-                    'kg3' => 'KG3',
-                    '1st' => 'الصف الأول',
-                    '2nd' => 'الصف الثاني',
-                    '3rd' => 'الصف الثالث',
-                    '4th' => 'الصف الرابع',
-                    '5th' => 'الصف الخامس',
-                    '6th' => 'الصف السادس',
-                    '7th' => 'الصف السابع',
-                    '8th' => 'الصف الثامن',
-                    '9th' => 'الصف التاسع',
-                    '10th' => 'الصف العاشر',
-                    '11th' => 'الصف الحادي عشر',
-                    '12th' => 'بكالوريا',
-                ];
+                $filters = [];
                 $modelQuery = School::query();
                 $currentType = 'school';
                 break;
