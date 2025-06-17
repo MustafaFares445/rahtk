@@ -141,8 +141,6 @@ class SearchController extends Controller
                 break;
             case ProductTypes::SCHOOL->value:
                 $filters = [];
-                $modelQuery = School::query();
-                $currentType = 'school';
                 break;
             case ProductTypes::ELECTRONIC->value:
                 $filters = [
