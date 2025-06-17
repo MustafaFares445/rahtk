@@ -185,10 +185,6 @@ class SearchController extends Controller
             $data[$currentType][$camelCaseKey] = $productsFilters->pluck($filter)->values()->unique()->toArray();
         }
 
-        if(!$request->get('type') == 'school'){
-            $data['school'] = [];
-        }
-
         return $data;
     }
 
