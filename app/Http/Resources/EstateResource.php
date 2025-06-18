@@ -60,6 +60,7 @@ class EstateResource extends JsonResource
             'floorsNumber' => $this->floors_number,
             'isFurnished' => $this->is_furnished,
             'floor' => $this->floor,
+            'type' => $this->type,
         ];
     }
 }

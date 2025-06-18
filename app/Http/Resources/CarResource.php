@@ -46,7 +46,6 @@ class CarResource extends JsonResource
             'id' => $this->id,
             'model' => $this->model,
             'year' => $this->year,
-            'type' => $this->type,
         ];
     }
 }

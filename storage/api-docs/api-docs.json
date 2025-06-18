@@ -6,6 +6,23 @@
         "version": "1.0.0"
     },
     "paths": {
+        "/api/activities": {
+            "get": {
+                "tags": [
+                    "Activities"
+                ],
+                "summary": "Get all activities",
+                "operationId": "575d9f97d0942b9e6da6420d68f6ce29",
+                "responses": {
+                    "200": {
+                        "description": "Successful operation"
+                    },
+                    "500": {
+                        "description": "Internal Server Error"
+                    }
+                }
+            }
+        },
         "/api/ads": {
             "get": {
                 "tags": [
@@ -836,6 +853,10 @@
         {
             "name": "HomePage",
             "description": "Operations related to the homepage products"
+        },
+        {
+            "name": "Activities",
+            "description": "Activities"
         },
         {
             "name": "Ads",

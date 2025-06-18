@@ -21,6 +21,7 @@ class Estate extends Model
         'floors_number',
         'is_furnished',
         'floor',
+        'type'
     ];
 
     /**

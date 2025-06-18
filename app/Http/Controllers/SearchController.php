@@ -2,20 +2,19 @@
 
 namespace App\Http\Controllers;
 
-use App\Enums\ProductTypes;
-use App\Http\Resources\ProductResource;
-use App\Models\Building;
 use App\Models\Car;
-use App\Models\Electronic;
+use App\Models\Farm;
 use App\Models\Estate;
 use App\Models\Product;
-use App\Models\School;
-use App\Models\Farm;
-use App\Models\SchoolClass;
+use App\Models\Building;
+use App\Models\Electronic;
+use App\Enums\ProductTypes;
+use Illuminate\Support\Str;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
+use App\Http\Controllers\Controller;
+use App\Http\Resources\ProductResource;
 use Symfony\Component\HttpFoundation\Exception\BadRequestException;
-use Illuminate\Support\Str;
 
 class SearchController extends Controller
 {
@@ -127,6 +126,7 @@ class SearchController extends Controller
                     'floors_number',
                     'is_furnished',
                     'floor',
+                    'type'
                 ];
                 $modelQuery = Estate::query();
                 $currentType = 'estate';

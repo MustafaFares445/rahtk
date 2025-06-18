@@ -21,6 +21,7 @@ return new class extends Migration
             $table->integer('floors_number');
             $table->boolean('is_furnished')->default(false);
             $table->string('floor');
+            $table->enum('type' , ['بيع', 'أجار', 'بيع/أجار'])->default('بيع');
             $table->timestamps();
         });
 

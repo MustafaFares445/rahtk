@@ -3,7 +3,6 @@
 namespace Database\Seeders;
 
 use App\Models\Estate;
-use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 
 class EstateSeeder extends Seeder
@@ -13,7 +12,7 @@ class EstateSeeder extends Seeder
      */
     public function run()
     {
-       Estate::query()->insert([
+        Estate::query()->insert([
             [
                 'product_id' => 1,
                 'rooms' => 3,

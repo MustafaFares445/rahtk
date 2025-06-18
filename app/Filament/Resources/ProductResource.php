@@ -292,6 +292,15 @@ class ProductResource extends Resource
                         ->step(1)
                         ->label('رقم الطابق')
                         ->required(),
+
+                    Forms\Components\Select::make('type')
+                        ->options([
+                            'بيع',
+                            'أجار',
+                            'بيع/أجار'
+                        ])
+                        ->placeholder('نوع العقار بيع أو عاجل')
+                        ->required(),
                 ])
                 ->columns(2)
         ];
