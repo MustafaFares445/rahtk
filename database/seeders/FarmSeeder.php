@@ -12,7 +12,6 @@ class FarmSeeder extends Seeder
        Farm::query()->insert([
             [
                 'product_id' => 5,
-                'type' => 'sell',
                 'bedrooms' => 3,
                 'bathrooms' => 2,
                 'floors_number' => 1,
@@ -22,7 +21,6 @@ class FarmSeeder extends Seeder
             ],
             [
                 'product_id' => 15,
-                'type' => 'rent',
                 'bedrooms' => 2,
                 'bathrooms' => 1,
                 'floors_number' => 1,
@@ -32,7 +30,6 @@ class FarmSeeder extends Seeder
             ],
             [
                 'product_id' => 16,
-                'type' => 'sell',
                 'bedrooms' => 4,
                 'bathrooms' => 3,
                 'floors_number' => 2,
