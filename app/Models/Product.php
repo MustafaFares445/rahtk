@@ -32,6 +32,18 @@ class Product extends Model implements HasMedia
         'type'
     ];
 
+
+    protected static function booted()
+    {
+        static::deleting(function ($product) {
+            $product->electronic()->delete();
+            $product->car()->delete();
+            $product->estate()->delete();
+            $product->farm()->delete();
+            $product->building()->delete();
+        });
+    }
+
     /**
      * Return the sluggable configuration array for this model.
      *
