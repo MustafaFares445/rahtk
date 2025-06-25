@@ -298,7 +298,7 @@ class SearchController extends Controller
             'maxPrice' => 'nullable|numeric|min:0',
         ]);
 
-        $productsQuery = Product::with(['media' , 'farm' , 'estate' , 'car' , 'school' , 'electronic'])
+        $productsQuery = Product::with(['media' , 'farm' , 'estate' , 'car' , 'school' , 'electronic' , 'building'])
             ->when($request->has('isUrgent') , fn($q) => $q->where('is_urgent' , true))
             ->when($request->has('discount') , fn($q) => $q->whereNotNull('discount'))
             ->when($request->has('minPrice'), fn($q) => $q->where('price', '>=', $request->get('minPrice')))

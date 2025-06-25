@@ -70,7 +70,7 @@ class HomePageController extends Controller
             return response()->json(['error' => 'At least one of isUrgent or discount is required.'], 400);
         }
 
-        $products =  Product::with(['media' , 'farm' , 'estate' , 'car' , 'school' , 'electronic'])
+        $products =  Product::with(['media' , 'farm' , 'estate' , 'car' , 'school' , 'electronic' , 'building'])
             ->when($request->has('isUrgent') , fn($q) => $q->where('is_urgent' , true))
             ->when($request->has('discount') , fn($q) => $q->whereNotNull('discount'))
             ->when($request->has('type') , fn($q) =>  $q->whereHas($request->get('type')))
