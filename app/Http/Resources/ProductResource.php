@@ -139,6 +139,7 @@ class ProductResource extends JsonResource
             'car' => CarResource::make($this->whenLoaded('car')),
             'electronic' => ElectronicResource::make($this->whenLoaded('electronic')),
             'farm' => FarmResource::make($this->whenLoaded('farm')),
+            'building'  => BuildingResource::make($this->whenLoaded('building')),
             'primaryImage' => MediaResource::make($this->getFirstMedia('images')),
             'media' => $this->when($this->getAllMedia ,MediaResource::collection($this->media))
         ];
