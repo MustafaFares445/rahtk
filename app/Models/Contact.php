@@ -25,6 +25,7 @@ class Contact extends Model
         'whatsapp',
         'phone',
         'instagram',
-        'facebook'
+        'facebook',
+        'telegram'
     ];
 }

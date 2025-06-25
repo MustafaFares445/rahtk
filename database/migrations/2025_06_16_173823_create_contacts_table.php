@@ -17,6 +17,7 @@ return new class extends Migration
             $table->string('phone')->nullable();
             $table->string('facebook')->nullable();
             $table->string('instagram')->nullable();
+            $table->string('telegram')->nullable();
             $table->timestamps();
         });
     }

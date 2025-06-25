@@ -162,7 +162,6 @@ class SearchController extends Controller
                 break;
             case ProductTypes::FARM->value:
                 $filters = [
-                    'type',
                     'bedrooms',
                     'bathrooms',
                     'floors_number',

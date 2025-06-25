@@ -49,7 +49,16 @@ class ContactInfoWidget extends Widget implements HasForms, HasActions
                             ->placeholder('+1234567890')
                             ->helperText('قم بتضمين رمز الدولة (مثال: +1234567890)')
                             ->maxLength(20)
-                            ->prefixIcon('heroicon-m-chat-bubble-left-ellipsis'),
+                            ->prefixIcon('heroicon-m-chat-bubble-left'),
+
+                        Forms\Components\TextInput::make('telegram')
+                            ->label('رقم تليغرام')
+                            ->tel()
+                            ->placeholder('+1234567890')
+                            ->helperText('قم بتضمين رمز الدولة (مثال: +1234567890)')
+                            ->maxLength(20)
+                            ->prefixIcon('heroicon-m-chat-bubble-left'),
+
                         Forms\Components\TextInput::make('phone')
                             ->label('رقم الهاتف')
                             ->tel()
@@ -57,6 +66,7 @@ class ContactInfoWidget extends Widget implements HasForms, HasActions
                             ->helperText('قم بتضمين رمز الدولة (مثال: +1234567890)')
                             ->maxLength(20)
                             ->prefixIcon('heroicon-m-phone'),
+
                         Forms\Components\TextInput::make('facebook')
                             ->label('رابط الفيسبوك')
                             ->url()

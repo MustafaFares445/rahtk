@@ -16,11 +16,13 @@ class DatabaseSeeder extends Seeder
             SchoolClassSeeder::class,
             TeacherSeeder::class,
             ClassTeacherSeeder::class,
-            // EstateSeeder::class,
+            EstateSeeder::class,
             CarSeeder::class,
             ElectronicSeeder::class,
             FarmSeeder::class,
             BuildingSeeder::class,
+            ActivitySeeder::class,
+            ContactSeeder::class
         ]);
     }
 }
