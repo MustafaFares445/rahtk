@@ -3,11 +3,9 @@
 namespace App\Filament\Resources\SchoolResource\Pages;
 
 use App\Models\School;
-use Filament\Forms\Form;
 use App\Models\SchoolClass;
 use App\Filament\Resources\SchoolResource;
 use Filament\Resources\Pages\CreateRecord;
-
 
 class CreateSchool extends CreateRecord
 {
@@ -15,13 +13,11 @@ class CreateSchool extends CreateRecord
 
     protected function handleRecordCreation(array $data): School
     {
-        // Create the School with the product_id
         $school = School::create([
             ...$data,
             'product_id' => 1,
         ]);
 
-        // Process teacher-class relationships after creation
         $this->processTeacherClassRelationships($school, $data);
 
         return $school;
@@ -96,7 +92,7 @@ class CreateSchool extends CreateRecord
             }
         }
 
-        dd($record->schoolClass);
+        // Process each class and assign teachers
         foreach ($record->schoolClasses as $class) {
             $classData = collect($schoolClasses)->firstWhere('id', $class->id);
             if ($classData && isset($classData['teacher_temp_key'])) {
@@ -106,6 +102,17 @@ class CreateSchool extends CreateRecord
                     $class->teachers()->detach();
                     $class->teachers()->attach($teacherId);
                     $class->save();
+                }
+            } elseif ($classData && isset($classData['teachers'])) {
+                // Handle existing teachers
+                $teacherIds = [];
+                foreach ($classData['teachers'] as $teacherIdentifier) {
+                    if (is_numeric($teacherIdentifier)) {
+                        $teacherIds[] = $teacherIdentifier;
+                    }
+                }
+                if (!empty($teacherIds)) {
+                    $class->teachers()->sync($teacherIds);
                 }
             }
         }

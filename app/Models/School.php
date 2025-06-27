@@ -29,6 +29,8 @@ class School extends Model implements HasMedia
     {
         parent::boot();
 
+        static::addGlobalScope(new ExcludeProductIdScope);
+        
         static::deleting(function ($school) {
             // Delete related school classes
             $school->schoolClasses()->each(function ($schoolClass) {

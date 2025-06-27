@@ -5,7 +5,6 @@ namespace App\Filament\Resources\SchoolResource\Pages;
 use Filament\Actions;
 use Filament\Resources\Pages\EditRecord;
 use App\Filament\Resources\SchoolResource;
-use Filament\Forms\Form;
 
 class EditSchool extends EditRecord
 {
@@ -17,6 +16,7 @@ class EditSchool extends EditRecord
             Actions\DeleteAction::make(),
         ];
     }
+
 
     protected function afterSave(): void
     {
@@ -35,14 +35,27 @@ class EditSchool extends EditRecord
             }
         }
 
-        // Update each class with the correct teacher_id
+
+        // Process each class and assign teachers
         foreach ($record->schoolClasses as $class) {
             $classData = collect($schoolClasses)->firstWhere('id', $class->id);
             if ($classData && isset($classData['teacher_temp_key'])) {
                 $teacherId = $tempKeyToId[$classData['teacher_temp_key']] ?? null;
                 if ($teacherId) {
-                    $class->teacher_id = $teacherId;
+                    /** @var SchoolClass $class */
+                    $class->teachers()->sync($teacherId);
                     $class->save();
+                }
+            } elseif ($classData && isset($classData['teachers'])) {
+                // Handle existing teachers
+                $teacherIds = [];
+                foreach ($classData['teachers'] as $teacherIdentifier) {
+                    if (is_numeric($teacherIdentifier)) {
+                        $teacherIds[] = $teacherIdentifier;
+                    }
+                }
+                if (!empty($teacherIds)) {
+                    $class->teachers()->sync($teacherIds);
                 }
             }
         }
