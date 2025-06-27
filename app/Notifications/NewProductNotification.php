@@ -36,11 +36,11 @@ class NewProductNotification extends Notification
         return (new FcmMessage(notification: new FcmNotification(
                 title: 'New Product Available!',
                 body: "Check out our new product: {$this->product->name}",
-                image: $this->product->getFirstMediaUrl('images') ?? null, // optional product image
+                image: $this->product->getFirstMediaUrl('images') ?? "", // optional product image
             )))
             ->data([
-                'product_id' => (string) $this->product->id,
-                'product_name' => $this->product->name,
+                'productId' => (string) $this->product->id,
+                'productTitle' => $this->product->title,
                 'action' => 'new_product',
                 'click_action' => 'FLUTTER_NOTIFICATION_CLICK', // for Flutter apps
             ])
@@ -74,8 +74,8 @@ class NewProductNotification extends Notification
     public function toArray($notifiable): array
     {
         return [
-            'product_id' => $this->product->id,
-            'product_name' => $this->product->name,
+            'productId' => (string) $this->product->id,
+            'productTitle' => (string) $this->product->title,
             'message' => "New product available: {$this->product->name}",
         ];
     }

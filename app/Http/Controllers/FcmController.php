@@ -146,8 +146,8 @@ class FcmController extends Controller
                     'fcmToken' => $request->input('token'),
                     'product' => [
                         'id' => $product->id,
-                        'name' => $product->name,
-                        'image_url' => $product->getFirstMediaUrl('images') ?? null,
+                        'title' => $product->title,
+                        'image_url' => $product->getFirstMediaUrl('images') ?? "",
                     ],
                     'notificationData' => [
                         'title' => 'New Product Available!',
