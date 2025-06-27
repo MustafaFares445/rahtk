@@ -80,7 +80,6 @@ class SchoolResource extends Resource
             ->description('المعلومات الأساسية عن المدرسة')
             ->collapsible()
             ->schema([
-                // Remove the relationship() call and handle product creation manually
                 Forms\Components\TextInput::make('product.title')
                     ->required()
                     ->maxLength(255)

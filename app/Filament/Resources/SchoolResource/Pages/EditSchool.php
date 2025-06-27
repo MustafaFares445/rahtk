@@ -3,7 +3,6 @@
 namespace App\Filament\Resources\SchoolResource\Pages;
 
 use Filament\Actions;
-use App\Models\Product;
 use Filament\Resources\Pages\EditRecord;
 use App\Filament\Resources\SchoolResource;
 

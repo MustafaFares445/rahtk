@@ -14,9 +14,17 @@ class CreateSchool extends CreateRecord
 
     protected function handleRecordCreation(array $data): School
     {
+        $product = Product::query()->create([
+            'title' => $data['product']['title'],
+            'description' =>$data['product']['description'],
+            'view' => 0,
+            'address' => $data['product']['address'],
+            'type' => 'school'
+        ]);
+
         $school = School::create([
             ...$data,
-            'product_id' => Product::query()->latest()->first()->id
+            'product_id' => $product->id
         ]);
 
         $this->processTeacherClassRelationships($school, $data);
