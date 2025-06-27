@@ -5,6 +5,7 @@ namespace App\Models;
 use Spatie\MediaLibrary\HasMedia;
 use Illuminate\Database\Eloquent\Model;
 use Spatie\MediaLibrary\InteractsWithMedia;
+use App\Models\Scopes\ExcludeProductIdScope;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 
@@ -30,7 +31,7 @@ class School extends Model implements HasMedia
         parent::boot();
 
         static::addGlobalScope(new ExcludeProductIdScope);
-        
+
         static::deleting(function ($school) {
             // Delete related school classes
             $school->schoolClasses()->each(function ($schoolClass) {
