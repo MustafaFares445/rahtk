@@ -3,8 +3,11 @@
 namespace App\Filament\Resources\SchoolResource\Pages;
 
 use App\Models\School;
+use Filament\Forms\Form;
+use App\Models\SchoolClass;
 use App\Filament\Resources\SchoolResource;
 use Filament\Resources\Pages\CreateRecord;
+
 
 class CreateSchool extends CreateRecord
 {
@@ -72,6 +75,38 @@ class CreateSchool extends CreateRecord
             // Attach teachers to the class
             if (!empty($teacherIds)) {
                 $schoolClass->teachers()->sync($teacherIds);
+            }
+        }
+    }
+
+    protected function afterSave(): void
+    {
+        $form = $this->form;
+        $record = $this->record;
+
+        $schoolTeachers = $form->getState()['school_teachers'] ?? [];
+        $schoolClasses = $form->getState()['school_classes'] ?? [];
+
+        // Map temp_key to teacher ID
+        $tempKeyToId = [];
+        foreach ($record->teachers as $teacher) {
+            $tempKey = $teacher->temp_key; // Make sure temp_key is fillable and saved
+            if ($tempKey) {
+                $tempKeyToId[$tempKey] = $teacher->id;
+            }
+        }
+
+        dd($record->schoolClass);
+        foreach ($record->schoolClasses as $class) {
+            $classData = collect($schoolClasses)->firstWhere('id', $class->id);
+            if ($classData && isset($classData['teacher_temp_key'])) {
+                $teacherId = $tempKeyToId[$classData['teacher_temp_key']] ?? null;
+                if ($teacherId) {
+                    /** @var SchoolClass $class */
+                    $class->teachers()->detach();
+                    $class->teachers()->attach($teacherId);
+                    $class->save();
+                }
             }
         }
     }

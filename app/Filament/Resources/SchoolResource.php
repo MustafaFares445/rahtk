@@ -2,13 +2,13 @@
 
 namespace App\Filament\Resources;
 
-use App\Models\School;
-use App\Models\Product;
-use App\Enums\ProductTypes;
 use Filament\Forms;
-use Filament\Forms\Form;
 use Filament\Tables;
+use App\Models\School;
+use Filament\Forms\Form;
 use Filament\Tables\Table;
+use App\Enums\ProductTypes;
+use Illuminate\Support\Str;
 use Filament\Resources\Resource;
 use Filament\Tables\Columns\ImageColumn;
 use App\Filament\Resources\SchoolResource\Pages;
@@ -219,7 +219,6 @@ class SchoolResource extends Resource
                     ->image()
                     ->multiple()
                     ->preserveFilenames()
-                    ->required()
                     ->label('صورة الخدمة')
                     ->columnSpan(2)
                     ->imageResizeMode('cover')
@@ -275,7 +274,6 @@ class SchoolResource extends Resource
                             ->imageResizeMode('cover')
                             ->imageCropAspectRatio('1:1')
                             ->imageEditor()
-                            ->acceptedFileTypes(['image/jpeg', 'image/png', 'image/gif', 'image/webp' , 'image/jpg'])
                             ->helperText('صورة شخصية عالية الجودة (نسبة 1:1 موصى بها)')
                             ->downloadable()
                             ->openable()
@@ -288,6 +286,10 @@ class SchoolResource extends Resource
                                 }
                                 return $state ?? null;
                             })
+                            ->dehydrated(),
+
+                        Forms\Components\Hidden::make('temp_key')
+                            ->default(fn () => (string) Str::uuid())
                             ->dehydrated(),
                     ])
                     ->columns(2)
@@ -344,7 +346,7 @@ class SchoolResource extends Resource
                         ->native(false)
                         ->extraInputAttributes(['dir' => 'rtl'])
                         ->afterStateUpdated(function ($state, Forms\Set $set) {
-                            if ($state === 'kga' || $state === 'kgb') {
+                            if ($state === 'kg1' || $state === 'kg2' || $state === 'kg3') {
                                 $set('type', 'initial');
                             } elseif (in_array($state, ['1st', '2nd', '3rd', '4th', '5th', '6th'])) {
                                 $set('type', 'principal');
@@ -360,89 +362,40 @@ class SchoolResource extends Resource
                         ->label('المستوى التعليمي')
                         ->dehydrated(true),
 
-                    Forms\Components\Select::make('teachers')
-                        ->label('المدرسون المعينون')
+                    Forms\Components\Select::make('teacher')
+                        ->label('اختر مدرسين')
+                        ->options(function (Forms\Get $get) {
+                            $schoolTeachers = collect($get('../../school_teachers') ?? []);
+                            $schoolId = $get('../../id');
+                            $savedTeachers = $schoolId
+                                ? \App\Models\Teacher::where('school_id', $schoolId)->get()
+                                : collect();
+
+                            // Build a set of unique identifiers for saved teachers (e.g., name + job_title)
+                            $savedTeacherKeys = $savedTeachers->map(function ($teacher) {
+                                return strtolower(trim($teacher->name)) . '|' . strtolower(trim($teacher->job_title));
+                            })->toArray();
+
+                            // Only include temp teachers that are not already saved
+                            $tempTeachers = $schoolTeachers
+                                ->filter(function ($teacher) use ($savedTeacherKeys) {
+                                    $key = strtolower(trim($teacher['name'] ?? '')) . '|' . strtolower(trim($teacher['job_title'] ?? ''));
+                                    return $teacher['name'] && !in_array($key, $savedTeacherKeys);
+                                })
+                                ->mapWithKeys(fn($teacher, $index) => [
+                                    'temp_' . ($teacher['temp_key'] ?? $index) => $teacher['name'] . ' - ' . $teacher['job_title']
+                                ]);
+
+                            $savedTeachersOptions = $savedTeachers->mapWithKeys(fn($teacher) => [
+                                $teacher->id => $teacher->name . ' - ' . $teacher->job_title
+                            ]);
+
+                            return $tempTeachers->union($savedTeachersOptions)->toArray();
+                        })
                         ->multiple()
                         ->searchable()
                         ->columnSpanFull()
-                        ->relationship('teachers', 'name')
-                        ->options(function (Forms\Get $get, $record) {
-                            // Get the school ID from the current context
-                            $schoolId = null;
-
-                            // Try to get school ID from the record (editing existing school)
-                            if ($record) {
-                                $schoolId = $record->school?->id;;
-                            }
-
-                            // If no school ID from record, try to get from form state
-                            if (!$schoolId) {
-                                $schoolId = $get('../../id'); // Adjust path based on your form structure
-                            }
-
-                            if (!$schoolId) {
-                                return [];
-                            }
-
-                            // Get all teachers for this school
-                            return \App\Models\Teacher::where('school_id', $schoolId)
-                                ->pluck('name', 'id')
-                                ->map(function ($name, $id) {
-                                    $teacher = \App\Models\Teacher::find($id);
-                                    return $name . ' - ' . ($teacher->job_title ?? '');
-                                })
-                                ->toArray();
-                        })
-                        ->getOptionLabelFromRecordUsing(fn ($record) => $record->name . ' - ' . $record->job_title)
-                        ->preload()
-                        ->createOptionAction(
-                            fn ($action) => $action->modalHeading('إضافة مدرس جديد')
-                        )
-                        ->createOptionForm([
-                            Forms\Components\Section::make('معلومات المدرس')
-                                ->columns(2)
-                                ->schema([
-                                    Forms\Components\TextInput::make('name')
-                                        ->required()
-                                        ->maxLength(255)
-                                        ->label('الاسم الكامل')
-                                        ->extraInputAttributes(['dir' => 'rtl']),
-
-                                    Forms\Components\TextInput::make('job_title')
-                                        ->required()
-                                        ->maxLength(255)
-                                        ->label('المسمى الوظيفي')
-                                        ->extraInputAttributes(['dir' => 'rtl']),
-
-                                    Forms\Components\SpatieMediaLibraryFileUpload::make('image')
-                                        ->collection('teachers-images')
-                                        ->image()
-                                        ->preserveFilenames()
-                                        ->required()
-                                        ->columnSpanFull()
-                                        ->label('صورة شخصية')
-                                        ->imageEditor()
-                                        ->imageCropAspectRatio('1:1')
-                                        ->extraInputAttributes(['dir' => 'rtl']),
-
-                                    Forms\Components\Hidden::make('school_id')
-                                        ->default(function (Forms\Get $get) {
-                                            // Get school ID from the parent form
-                                            return $get('../../../id'); // Adjust path based on your form structure
-                                        })
-                                        ->dehydrated(),
-                                ]),
-                        ])
-                        ->createOptionUsing(function (array $data, Forms\Get $get) {
-                            // Create the teacher with the school ID
-                            $schoolId = $get('../../id') ?? $data['school_id'];
-                            $data['school_id'] = $schoolId;
-
-                            $teacher = \App\Models\Teacher::create($data);
-
-                            return $teacher->id;
-                        })
-                        ->hint('اختر أو أضف مدرسين لهذا الفصل')
+                        ->hint('اختر مدرسين من المدرسين المضافين أعلاه أو من قاعدة البيانات')
                         ->live(),
 
                     Forms\Components\SpatieMediaLibraryFileUpload::make('videos')
