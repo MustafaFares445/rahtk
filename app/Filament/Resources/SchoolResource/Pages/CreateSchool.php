@@ -5,6 +5,7 @@ namespace App\Filament\Resources\SchoolResource\Pages;
 use App\Models\School;
 use App\Models\SchoolClass;
 use App\Filament\Resources\SchoolResource;
+use App\Models\Product;
 use Filament\Resources\Pages\CreateRecord;
 
 class CreateSchool extends CreateRecord
@@ -116,5 +117,10 @@ class CreateSchool extends CreateRecord
                 }
             }
         }
+
+
+        $this->record->product_id = Product::query()->latest()->first()->id;
+        $this->record->save();
+        
     }
 }
