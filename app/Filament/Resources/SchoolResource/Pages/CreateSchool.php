@@ -16,7 +16,7 @@ class CreateSchool extends CreateRecord
     {
         $school = School::create([
             ...$data,
-            'product_id' => 1,
+            'product_id' => Product::query()->latest()->first()->id
         ]);
 
         $this->processTeacherClassRelationships($school, $data);
@@ -117,8 +117,5 @@ class CreateSchool extends CreateRecord
                 }
             }
         }
-
-
-        $this->record->update(['product_id' => Product::query()->first()->id]);
     }
 }

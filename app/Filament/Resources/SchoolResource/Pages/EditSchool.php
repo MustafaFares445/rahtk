@@ -59,7 +59,5 @@ class EditSchool extends EditRecord
                 }
             }
         }
-
-        $this->record->update(['product_id' => Product::query()->first()->id]);
     }
 }
