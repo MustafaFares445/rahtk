@@ -119,8 +119,6 @@ class CreateSchool extends CreateRecord
         }
 
 
-        $this->record->product_id = Product::query()->latest()->first()->id;
-        $this->record->save();
-        
+        $this->record->update(['product_id' => Product::query()->first()->id]);
     }
 }

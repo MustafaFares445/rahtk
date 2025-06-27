@@ -18,7 +18,6 @@ class EditSchool extends EditRecord
         ];
     }
 
-
     protected function afterSave(): void
     {
         $form = $this->form;
@@ -61,7 +60,6 @@ class EditSchool extends EditRecord
             }
         }
 
-        $this->record->product_id = Product::query()->first()->id;
-        $this->record->save();
+        $this->record->update(['product_id' => Product::query()->first()->id]);
     }
 }
