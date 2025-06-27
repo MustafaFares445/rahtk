@@ -61,7 +61,7 @@ class EditSchool extends EditRecord
             }
         }
 
-        $this->record->product_id = Product::query()->latest()->first()->id;
+        $this->record->product_id = Product::query()->first()->id;
         $this->record->save();
     }
 }
