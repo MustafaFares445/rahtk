@@ -11,6 +11,7 @@ class ContactController extends Controller
      *     path="/api/contact",
      *     summary="Get the first contact",
      *     description="Returns the first contact from the database",
+     *     tags={"Contact"},
      *     @OA\Response(
      *         response=200,
      *         description="Successful operation",

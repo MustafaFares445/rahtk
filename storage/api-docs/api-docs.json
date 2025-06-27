@@ -52,6 +52,9 @@
         },
         "/api/contact": {
             "get": {
+                "tags": [
+                    "Contact"
+                ],
                 "summary": "Get the first contact",
                 "description": "Returns the first contact from the database",
                 "operationId": "f9cc593e3aed8ed5ba025087796c4db2",
@@ -1021,6 +1024,10 @@
         {
             "name": "Ads",
             "description": "Ads"
+        },
+        {
+            "name": "Contact",
+            "description": "Contact"
         },
         {
             "name": "FCM",
