@@ -466,8 +466,7 @@ class ProductResource extends Resource
                 ->label('السعر')
                 ->money('USD')
                 ->sortable()
-                ->color(fn($record) => $record->discount ? 'success' : null)
-                ->description(fn($record) => $record->discount ? 'السعر قبل الخصم: $'.number_format($record->price / (1 - $record->discount / 100), 2) : null),
+                ->color(fn($record) => $record->discount ? 'success' : null),
 
             Tables\Columns\IconColumn::make('is_urgent')
                 ->label('مستعجل')

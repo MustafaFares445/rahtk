@@ -25,8 +25,7 @@ class ProductObserver
     private function sendNewProductNotification(Product $product): void
     {
         try {
-            // Get all active FCM tokens
-            $tokens = FcmToken::all();
+            $tokens = FcmToken::query()->pluck('token')->toArray();
 
             if (empty($tokens)) {
                 return;
