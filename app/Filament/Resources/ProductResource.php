@@ -2,18 +2,20 @@
 
 namespace App\Filament\Resources;
 
-use App\Enums\ProductTypes;
-use App\Models\Product;
-use App\Filament\Resources\ProductResource\Pages;
 use Filament\Forms;
-use Filament\Forms\Components\Section;
-use Filament\Forms\Form;
-use Filament\Resources\Resource;
 use Filament\Tables;
+use App\Models\Product;
+use Filament\Forms\Form;
 use Filament\Tables\Table;
-use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Support\Facades\Blade;
+use App\Enums\ProductTypes;
+use Filament\Resources\Resource;
 use Illuminate\Support\HtmlString;
+use Illuminate\Support\Facades\Blade;
+use Filament\Forms\Components\Section;
+use Illuminate\Database\Eloquent\Builder;
+use App\Filament\Resources\ProductResource\Pages;
+use Illuminate\Container\Attributes\Log;
+use Illuminate\Support\Facades\Log as FacadesLog;
 
 class ProductResource extends Resource
 {
@@ -83,13 +85,6 @@ class ProductResource extends Resource
         $relationshipData = $data['relationship_data'] ?? [];
 
         if (isset(self::$typeFieldMappings[$type])) {
-            // // Handle boolean fields properly for estate type
-            // if ($type === 'estate') {
-            //     $relationshipData['is_furnished'] = isset($relationshipData['is_furnished'])
-            //         ? (bool) $relationshipData['is_furnished']
-            //         : false;
-            // }
-
             $product->$type()->updateOrCreate([], $relationshipData);
         }
     }
@@ -277,15 +272,6 @@ class ProductResource extends Resource
                         ->label('الطوابق')
                         ->required(),
 
-                    // Forms\Components\Toggle::make('is_furnished')
-                    //     ->label('وضع علامة مفروشة')
-                    //     ->default(false)
-                    //     ->inline(false)
-                    //     ->afterStateHydrated(function (Forms\Components\Toggle $component, $state) {
-                    //         // Ensure boolean value
-                    //         $component->state((bool) $state);
-                    //     }),
-
                     Forms\Components\TextInput::make('floor')
                         ->numeric()
                         ->minValue(0)
@@ -295,9 +281,9 @@ class ProductResource extends Resource
 
                     Forms\Components\Select::make('type')
                         ->options([
-                            'بيع',
-                            'أجار',
-                            'بيع/أجار'
+                            'بيع' => 'بيع',
+                            'أجار' => 'أجار',
+                            'بيع/أجار' => 'بيع/أجار'
                         ])
                         ->placeholder('نوع العقار بيع أو عاجل')
                         ->required(),
@@ -317,7 +303,7 @@ class ProductResource extends Resource
                         ->label('الموديل')
                         ->required(),
 
-                    self::getYearField(),
+                    self::getYearField()
                 ])
                 ->columns(2)
         ];
@@ -412,26 +398,16 @@ class ProductResource extends Resource
 
     /* ==================== مكونات قابلة لإعادة الاستخدام ==================== */
 
-    private static function getYearField(): Forms\Components\Select
+    private static function getYearField(): Forms\Components\TextInput
     {
-        return Forms\Components\Select::make('year')
-            ->required()
+        return  Forms\Components\TextInput::make('year')
             ->label('السنة')
-            ->options(function () {
-                $currentYear = now()->year;
-                $startYear = 1990;
-                $years = [];
-
-                for ($year = $currentYear; $year >= $startYear; $year--) {
-                    $years[$year] = $year;
-                }
-
-                return $years;
-            })
-            ->searchable()
-            ->placeholder('اختر السنة')
-            ->extraInputAttributes(['dir' => 'rtl']);
-
+            ->numeric()
+            ->minValue(1900)
+            ->maxValue(now()->year)
+            ->placeholder('أدخل سنة بين عامي 1900 و السنة الحالية')
+            ->extraInputAttributes(['dir' => 'rtl'])
+            ->required();
     }
 
     private static function getLoadingIndicator(): HtmlString
@@ -569,7 +545,7 @@ class ProductResource extends Resource
                         $indicators[] = 'الحد الأقصى للسعر: $'.number_format($data['max_price'], 2);
                     }
                     return $indicators;
-                }),
+                })
         ];
     }
 }

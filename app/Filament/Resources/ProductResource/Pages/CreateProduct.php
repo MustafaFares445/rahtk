@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources\ProductResource\Pages;
 
+use Illuminate\Support\Facades\Log;
 use Filament\Resources\Pages\CreateRecord;
 use App\Filament\Resources\ProductResource;
 

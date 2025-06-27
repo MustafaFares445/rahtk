@@ -3,6 +3,7 @@
 namespace App\Filament\Resources;
 
 use App\Models\School;
+use App\Models\Product;
 use App\Enums\ProductTypes;
 use Filament\Forms;
 use Filament\Forms\Form;
@@ -78,31 +79,31 @@ class SchoolResource extends Resource
             ->icon('heroicon-o-information-circle')
             ->description('المعلومات الأساسية عن المدرسة')
             ->collapsible()
-            ->relationship('product')
             ->schema([
-                Forms\Components\TextInput::make('title')
+                // Remove the relationship() call and handle product creation manually
+                Forms\Components\TextInput::make('product.title')
                     ->required()
                     ->maxLength(255)
                     ->label('اسم المدرسة')
                     ->helperText('أدخل الاسم الرسمي للمدرسة.')
                     ->extraInputAttributes(['dir' => 'rtl']),
 
-                Forms\Components\Textarea::make('description')
+                Forms\Components\Textarea::make('product.description')
                     ->required()
                     ->columnSpanFull()
                     ->label('وصف المدرسة')
                     ->extraInputAttributes(['dir' => 'rtl']),
 
-                Forms\Components\TextInput::make('address')
+                Forms\Components\TextInput::make('product.address')
                     ->required()
                     ->maxLength(255)
                     ->label('عنوان المدرسة')
                     ->extraInputAttributes(['dir' => 'rtl']),
 
-                Forms\Components\Hidden::make('type')
+                Forms\Components\Hidden::make('product.type')
                     ->default(ProductTypes::SCHOOL->value),
 
-                Forms\Components\SpatieMediaLibraryFileUpload::make('image')
+                Forms\Components\SpatieMediaLibraryFileUpload::make('product.image')
                     ->collection('primary-image')
                     ->image()
                     ->preserveFilenames()

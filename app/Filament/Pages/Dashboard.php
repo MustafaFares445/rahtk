@@ -2,10 +2,6 @@
 
 namespace App\Filament\Pages;
 
-use Filament\Forms;
-use App\Models\Contact;
-use Filament\Actions\Action;
-use Filament\Notifications\Notification;
 use App\Filament\Widgets\ContactInfoWidget;
 use App\Filament\Widgets\ProductGrowthChart;
 use Filament\Pages\Dashboard as BaseDashboard;
