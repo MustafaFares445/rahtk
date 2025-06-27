@@ -83,6 +83,166 @@
                 }
             }
         },
+        "/api/fcm/update": {
+            "post": {
+                "tags": [
+                    "FCM"
+                ],
+                "summary": "Register or update an FCM token",
+                "operationId": "c841f14362e51642753f6bc5959f60e4",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "token"
+                                ],
+                                "properties": {
+                                    "token": {
+                                        "type": "string",
+                                        "example": "fcm_token_example"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "204": {
+                        "description": "No content"
+                    }
+                }
+            }
+        },
+        "/api/fcm/destroy": {
+            "post": {
+                "tags": [
+                    "FCM"
+                ],
+                "summary": "Delete an FCM token",
+                "operationId": "e00d976177355641ad3a29c07ec588a6",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "token"
+                                ],
+                                "properties": {
+                                    "token": {
+                                        "type": "string",
+                                        "example": "fcm_token_example"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "204": {
+                        "description": "No content"
+                    }
+                }
+            }
+        },
+        "/api/fcm/test": {
+            "post": {
+                "tags": [
+                    "FCM"
+                ],
+                "summary": "Send a test notification to a specific FCM token",
+                "operationId": "33d81a5f65b091eb49bce7f04cc410f9",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "token"
+                                ],
+                                "properties": {
+                                    "token": {
+                                        "type": "string",
+                                        "example": "fcm_token_example"
+                                    },
+                                    "productId": {
+                                        "type": "integer",
+                                        "example": 1
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Notification sent",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Test notification sent to single token"
+                                        },
+                                        "data": {
+                                            "properties": {
+                                                "fcmToken": {
+                                                    "type": "string"
+                                                },
+                                                "product": {
+                                                    "properties": {
+                                                        "id": {
+                                                            "type": "integer"
+                                                        },
+                                                        "name": {
+                                                            "type": "string"
+                                                        },
+                                                        "image_url": {
+                                                            "type": "string",
+                                                            "nullable": true
+                                                        }
+                                                    },
+                                                    "type": "object"
+                                                },
+                                                "notificationData": {
+                                                    "properties": {
+                                                        "title": {
+                                                            "type": "string"
+                                                        },
+                                                        "body": {
+                                                            "type": "string"
+                                                        }
+                                                    },
+                                                    "type": "object"
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "No products found in database"
+                    },
+                    "500": {
+                        "description": "Failed to send notification"
+                    }
+                }
+            }
+        },
         "/api/home/products": {
             "get": {
                 "tags": [
@@ -861,6 +1021,10 @@
         {
             "name": "Ads",
             "description": "Ads"
+        },
+        {
+            "name": "FCM",
+            "description": "FCM"
         },
         {
             "name": "Products",
