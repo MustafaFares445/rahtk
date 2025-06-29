@@ -67,6 +67,14 @@ use Illuminate\Http\Resources\Json\JsonResource;
  */
 class SchoolResource extends JsonResource
 {
+    private bool $getAllMedia;
+
+    public function __construct($resource ,  bool $getAllMedia = false)
+    {
+        $this->getAllMedia = $getAllMedia;
+        $this->resource = $resource;
+    }
+
     /**
      * Transform the resource into an array.
      *
@@ -86,7 +94,7 @@ class SchoolResource extends JsonResource
             'schoolClasses' => SchoolClassResource::collection($this->whenLoaded('schoolClasses')),
             'managerImage' => MediaResource::make($this->getFirstMedia('managers-images')),
             'primaryImage' => MediaResource::make($this->getFirstMedia('primary-image')),
-            'media' => $this->when($this->getAllMedia, MediaResource::collection($this->media->where('collection_name' , 'primary-image'))),
+            'media' => $this->when($this->getAllMedia, MediaResource::collection($this->media)),
         ];
     }
 }

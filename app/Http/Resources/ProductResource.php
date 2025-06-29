@@ -135,7 +135,7 @@ class ProductResource extends JsonResource
             'view' => $this->view,
             'address' => $this->address,
             'estate' => EstateResource::make($this->whenLoaded('estate')),
-            'school' => SchoolResource::make($this->whenLoaded('school')),
+            'school' =>  new SchoolResource($this->whenLoaded('school') , $this->getAllMedia),
             'car' => CarResource::make($this->whenLoaded('car')),
             'electronic' => ElectronicResource::make($this->whenLoaded('electronic')),
             'farm' => FarmResource::make($this->whenLoaded('farm')),
