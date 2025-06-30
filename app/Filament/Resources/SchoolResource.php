@@ -19,6 +19,7 @@ class SchoolResource extends Resource
     protected static ?string $navigationLabel = 'المدارس';
     protected static ?string $navigationIcon = 'heroicon-o-academic-cap';
 
+
     public static function form(Form $form): Form
     {
         return $form
@@ -98,9 +99,6 @@ class SchoolResource extends Resource
                     ->maxLength(255)
                     ->label('عنوان المدرسة')
                     ->extraInputAttributes(['dir' => 'rtl']),
-
-                Forms\Components\Hidden::make('product.type')
-                    ->default(ProductTypes::SCHOOL->value),
 
                 Forms\Components\SpatieMediaLibraryFileUpload::make('product.image')
                     ->collection('primary-image')
@@ -334,128 +332,148 @@ class SchoolResource extends Resource
                     ->default(0),
 
                 Forms\Components\Repeater::make('school_classes')
-                ->relationship('schoolClasses')
-                ->label('قائمة الفصول')
-                ->schema([
-                    Forms\Components\Select::make('name')
-                        ->required()
-                        ->options($classes)
-                        ->columnSpan(1)
-                        ->label('اسم الفصل')
-                        ->native(false)
-                        ->extraInputAttributes(['dir' => 'rtl'])
-                        ->afterStateUpdated(function ($state, Forms\Set $set) {
-                            if ($state === 'kg1' || $state === 'kg2' || $state === 'kg3') {
-                                $set('type', 'initial');
-                            } elseif (in_array($state, ['1st', '2nd', '3rd', '4th', '5th', '6th'])) {
-                                $set('type', 'principal');
-                            } elseif (in_array($state, ['7th', '8th', '9th', '10th', '11th', '12th'])) {
-                                $set('type', 'secondary');
-                            }
-                        })
-                        ->live(),
-
-                    Forms\Components\Hidden::make('type')
-                        ->required()
-                        ->columnSpan(1)
-                        ->label('المستوى التعليمي')
-                        ->dehydrated(true),
-
-                    Forms\Components\Select::make('teacher')
-                        ->label('اختر مدرسين')
-                        ->options(function (Forms\Get $get) {
-                            $schoolTeachers = collect($get('../../school_teachers') ?? []);
-                            $schoolId = $get('../../id');
-                            $savedTeachers = $schoolId
-                                ? \App\Models\Teacher::where('school_id', $schoolId)->get()
-                                : collect();
-
-                            // Build a set of unique identifiers for saved teachers (e.g., name + job_title)
-                            $savedTeacherKeys = $savedTeachers->map(function ($teacher) {
-                                return strtolower(trim($teacher->name)) . '|' . strtolower(trim($teacher->job_title));
-                            })->toArray();
-
-                            // Only include temp teachers that are not already saved
-                            $tempTeachers = $schoolTeachers
-                                ->filter(function ($teacher) use ($savedTeacherKeys) {
-                                    $key = strtolower(trim($teacher['name'] ?? '')) . '|' . strtolower(trim($teacher['job_title'] ?? ''));
-                                    return $teacher['name'] && !in_array($key, $savedTeacherKeys);
-                                })
-                                ->mapWithKeys(fn($teacher, $index) => [
-                                    'temp_' . ($teacher['temp_key'] ?? $index) => $teacher['name'] . ' - ' . $teacher['job_title']
-                                ]);
-
-                            $savedTeachersOptions = $savedTeachers->mapWithKeys(fn($teacher) => [
-                                $teacher->id => $teacher->name . ' - ' . $teacher->job_title
-                            ]);
-
-                            return $tempTeachers->union($savedTeachersOptions)->toArray();
-                        })
-                        ->multiple()
-                        ->searchable()
-                        ->columnSpanFull()
-                        ->hint('اختر مدرسين من المدرسين المضافين أعلاه أو من قاعدة البيانات')
-                        ->live(),
-
-                    Forms\Components\SpatieMediaLibraryFileUpload::make('videos')
-                        ->collection('videos')
-                        ->multiple()
-                        ->acceptedFileTypes(['video/mp4', 'video/quicktime', 'video/x-msvideo', 'video/x-ms-wmv'])
-                        ->preserveFilenames()
-                        ->columnSpanFull()
-                        ->label('فيديوهات الفصل')
-                        ->downloadable()
-                        ->openable()
-                        ->helperText('قم بتحميل فيديو تعريفي أو توضيحي للفصل (الحد الأقصى 50MB)')
-                        ->hint('صيغة MP4, MOV, AVI, أو WMV')
-                        ->extraInputAttributes(['dir' => 'rtl']),
-
-                    Forms\Components\SpatieMediaLibraryFileUpload::make('images')
-                        ->collection('images')
-                        ->image()
-                        ->multiple()
-                        ->preserveFilenames()
-                        ->columnSpanFull()
-                        ->label('معرض الصور')
-                        ->reorderable()
-                        ->appendFiles()
-                        ->imageResizeMode('cover')
-                        ->imageEditor()
-                        ->helperText('قم بتحميل صور للفصل أو أعمال الطلاب أو الأنشطة')
-                        ->hint('صيغة JPEG, PNG, GIF, أو WebP')
-                        ->directory('class-gallery')
-                        ->extraInputAttributes(['dir' => 'rtl']),
-                ])
-                ->columns(2)
-                ->addActionLabel('+ إضافة فصل جديد')
-                ->reorderableWithButtons()
-                ->collapsible()
-                ->cloneable()
-                ->deleteAction(
-                    fn ($action) => $action
-                        ->before(function ($component, $state) {
-                            // Get the school class ID from the current state
-                            if (isset($state['id'])) {
-                                $schoolClass = \App\Models\SchoolClass::find($state['id']);
-                                if ($schoolClass) {
-                                    // Detach all teachers before deletion
-                                    $schoolClass->teachers()->detach();
-                                    // Clear media collections
-                                    $schoolClass->clearMediaCollection('videos');
-                                    $schoolClass->clearMediaCollection('images');
+                    ->relationship('schoolClasses')
+                    ->label('قائمة الفصول')
+                    ->schema([
+                        Forms\Components\Select::make('name')
+                            ->required()
+                            ->options($classes)
+                            ->columnSpan(1)
+                            ->label('اسم الفصل')
+                            ->native(false)
+                            ->extraInputAttributes(['dir' => 'rtl'])
+                            ->afterStateUpdated(function ($state, Forms\Set $set) {
+                                if ($state === 'kg1' || $state === 'kg2' || $state === 'kg3') {
+                                    $set('type', 'initial');
+                                } elseif (in_array($state, ['1st', '2nd', '3rd', '4th', '5th', '6th'])) {
+                                    $set('type', 'principal');
+                                } elseif (in_array($state, ['7th', '8th', '9th', '10th', '11th', '12th'])) {
+                                    $set('type', 'secondary');
                                 }
-                            }
-                        })
-                        ->requiresConfirmation()
-                        ->modalHeading('تأكيد الحذف')
-                        ->modalDescription('هل أنت متأكد من حذف هذا الفصل؟ سيتم حذف جميع البيانات المرتبطة به.')
-                        ->modalSubmitActionLabel('نعم، احذف')
-                        ->modalCancelActionLabel('إلغاء')
-                )
-                ->itemLabel(fn (array $state): ?string => isset($classes[$state['name']]) ? "{$classes[$state['name']]}" : 'فصل جديد')
-                ->grid(2)
-                ->defaultItems(1)
-                ->collapsed(),
+                            })
+                            ->live(),
+
+                        Forms\Components\Hidden::make('type')
+                            ->required()
+                            ->columnSpan(1)
+                            ->label('المستوى التعليمي')
+                            ->dehydrated(true),
+
+                        Forms\Components\Select::make('teacher')
+                            ->label('اختر مدرسين')
+                            ->options(function (Forms\Get $get, $operation) {
+                                // Get current school teachers from the form
+                                $schoolTeachers = collect($get('../../school_teachers') ?? []);
+
+                                // Get the current record (school) if editing
+                                $record = $get('../../id');
+                                $savedTeachers = collect();
+
+                                if ($record && $operation === 'edit') {
+                                    $school = \App\Models\School::find($record);
+                                    if ($school) {
+                                        $savedTeachers = $school->teachers;
+                                    }
+                                }
+
+                                $options = [];
+
+                                $tempKeys = [];
+
+                                // Add existing/saved teachers
+                                foreach ($savedTeachers as $teacher) {
+                                    $options[$teacher->id] = $teacher->name . ' - ' . $teacher->job_title;
+                                    $tempKeys[] = $teacher->temp_key;
+                                }
+
+                                // Add temporary teachers (from the current form)
+                                foreach ($schoolTeachers as $index => $teacher) {
+                                    if (!empty($teacher['name']) && !empty($teacher['job_title']) && ! in_array($teacher['temp_key'] , $tempKeys)) {
+                                        $tempKey = $teacher['temp_key'] ?? $index;
+                                        $options['temp_' . $tempKey] = $teacher['name'] . ' - ' . $teacher['job_title'] . ' (جديد)';
+                                    }
+                                }
+
+                                return $options;
+                            })
+                            ->multiple()
+                            ->searchable()
+                            ->columnSpanFull()
+                            ->hint('اختر مدرسين من المدرسين المضافين أعلاه أو من قاعدة البيانات')
+                            ->live()
+                            ->default(function (Forms\Get $get, $operation) {
+                                // Pre-populate with existing teacher assignments when editing
+                                if ($operation === 'edit') {
+                                    $classId = $get('id');
+                                    if ($classId) {
+                                        $schoolClass = \App\Models\SchoolClass::find($classId);
+                                        if ($schoolClass) {
+                                            return $schoolClass->teachers->pluck('id')->toArray();
+                                        }
+                                    }
+                                }
+                                return [];
+                            }),
+
+                        Forms\Components\SpatieMediaLibraryFileUpload::make('videos')
+                            ->collection('videos')
+                            ->multiple()
+                            ->acceptedFileTypes(['video/mp4', 'video/quicktime', 'video/x-msvideo', 'video/x-ms-wmv'])
+                            ->preserveFilenames()
+                            ->columnSpanFull()
+                            ->label('فيديوهات الفصل')
+                            ->downloadable()
+                            ->openable()
+                            ->helperText('قم بتحميل فيديو تعريفي أو توضيحي للفصل (الحد الأقصى 50MB)')
+                            ->hint('صيغة MP4, MOV, AVI, أو WMV')
+                            ->extraInputAttributes(['dir' => 'rtl']),
+
+                        Forms\Components\SpatieMediaLibraryFileUpload::make('images')
+                            ->collection('images')
+                            ->image()
+                            ->multiple()
+                            ->preserveFilenames()
+                            ->columnSpanFull()
+                            ->label('معرض الصور')
+                            ->reorderable()
+                            ->appendFiles()
+                            ->imageResizeMode('cover')
+                            ->imageEditor()
+                            ->helperText('قم بتحميل صور للفصل أو أعمال الطلاب أو الأنشطة')
+                            ->hint('صيغة JPEG, PNG, GIF, أو WebP')
+                            ->directory('class-gallery')
+                            ->extraInputAttributes(['dir' => 'rtl']),
+                    ])
+                    ->columns(2)
+                    ->addActionLabel('+ إضافة فصل جديد')
+                    ->reorderableWithButtons()
+                    ->collapsible()
+                    ->cloneable()
+                    ->deleteAction(
+                        fn ($action) => $action
+                            ->before(function ($component, $state) {
+                                // Get the school class ID from the current state
+                                if (isset($state['id'])) {
+                                    $schoolClass = \App\Models\SchoolClass::find($state['id']);
+                                    if ($schoolClass) {
+                                        // Detach all teachers before deletion
+                                        $schoolClass->teachers()->detach();
+                                        // Clear media collections
+                                        $schoolClass->clearMediaCollection('videos');
+                                        $schoolClass->clearMediaCollection('images');
+                                    }
+                                }
+                            })
+                            ->requiresConfirmation()
+                            ->modalHeading('تأكيد الحذف')
+                            ->modalDescription('هل أنت متأكد من حذف هذا الفصل؟ سيتم حذف جميع البيانات المرتبطة به.')
+                            ->modalSubmitActionLabel('نعم، احذف')
+                            ->modalCancelActionLabel('إلغاء')
+                    )
+                    ->itemLabel(fn (array $state): ?string => isset($classes[$state['name']]) ? "{$classes[$state['name']]}" : 'فصل جديد')
+                    ->grid(2)
+                    ->defaultItems(1)
+                    ->collapsed(),
             ]);
     }
 

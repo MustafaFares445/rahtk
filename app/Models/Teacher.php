@@ -22,6 +22,7 @@ class Teacher extends Model implements HasMedia
         'name',
         'school_id',
         'job_title',
+        'temp_key'
     ];
 
     protected static function boot()
