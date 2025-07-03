@@ -45,7 +45,7 @@ class SchoolClass extends Model implements HasMedia
         return $this->belongsToMany(Teacher::class , 'class_teachers');
     }
 
-
+ 
     public function registerMediaCollections(): void
     {
         $this->addMediaCollection('images')

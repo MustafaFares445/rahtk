@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Spatie\MediaLibrary\HasMedia;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Builder;
 use Spatie\MediaLibrary\InteractsWithMedia;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -22,7 +23,6 @@ class Teacher extends Model implements HasMedia
         'name',
         'school_id',
         'job_title',
-        'temp_key'
     ];
 
     protected static function boot()
@@ -32,6 +32,12 @@ class Teacher extends Model implements HasMedia
         // When a teacher is deleted, detach from all classes
         static::deleting(function ($teacher) {
             $teacher->schoolClasses()->detach();
+        });
+
+        static::addGlobalScope('school', function (Builder $builder) {
+            if ($schoolId = request()->input('ownerRecord.id')) {
+                $builder->where('school_id', $schoolId);
+            }
         });
     }
 
