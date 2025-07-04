@@ -24,7 +24,7 @@ class Teacher extends Model implements HasMedia
         'school_id',
         'job_title',
     ];
-
+ 
     protected static function boot()
     {
         parent::boot();
