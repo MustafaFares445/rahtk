@@ -14,10 +14,6 @@ class User extends Authenticatable
     /** @use HasFactory<\Database\Factories\UserFactory> */
     use HasFactory, Notifiable , HasApiTokens;
 
-    public function canAccessPanel(Panel $panel): bool
-    {
-        return true;
-    }
 
     /**
      * The attributes that are mass assignable.

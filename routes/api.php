@@ -25,3 +25,6 @@ Route::delete('/fcm-tokens', [FcmController::class, 'destroy']);
 Route::post('/fcm/update', [FcmController::class, 'update']);
 Route::post('/fcm/destroy', [FcmController::class, 'destroy']);
 Route::post('/fcm/test', [FcmController::class, 'testToken']);
+Route::get('/privacy' , function(){
+    return view('privacy');
+});
