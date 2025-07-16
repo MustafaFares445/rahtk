@@ -1,8 +1,12 @@
-@extends('layouts.app')
-
-@section('title', 'Privacy Policy - سوقك')
-
-@section('content')
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Privacy Policy - سوقك</title>
+</head>
+<body>
 <div class="container py-5">
     <div class="row justify-content-center">
         <div class="col-lg-10">
@@ -11,7 +15,7 @@
                     <h1 class="h4 mb-0">Privacy Policy</h1>
                     <p class="mb-0 small">Last updated: July 16, 2025</p>
                 </div>
-                
+
                 <div class="card-body">
                     <div class="alert alert-info">
                         <p class="mb-0">This Privacy Notice for Mohammad ("we," "us," or "our"), describes how and why we might access, collect, store, use, and/or share ("process") your personal information when you use our services ("Services").</p>
@@ -56,7 +60,7 @@
                         </div>
                     </div>
                 </div>
-                
+
                 <div class="card-footer text-muted small">
                     <p class="mb-0">© {{ date('Y') }} سوقك. All rights reserved.</p>
                 </div>
@@ -64,9 +68,7 @@
         </div>
     </div>
 </div>
-@endsection
 
-@section('styles')
 <style>
     .card {
         border-radius: 10px;
@@ -78,13 +80,15 @@
         font-weight: 600;
     }
     .text-primary {
-        color: #4e73df !important;
+        color: #28a745 !important;
     }
     .bg-primary {
-        background-color: #4e73df !important;
+        background-color: #28a745 !important;
     }
     .border-primary {
-        border-color: #4e73df !important;
+        border-color: #28a745 !important;
     }
 </style>
-@endsection
+
+</body>
+</html>
